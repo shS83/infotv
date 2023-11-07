@@ -1,0 +1,100 @@
+body {
+font-family: 'Raleway', sans-serif;
+font-size: 1.0em;
+}
+
+.s-row {
+    display: flex;
+    justify-items: flex-start;
+}
+
+.s-square {
+    height: 14px;
+    width: 14px;
+    border: 1px solid #111;
+    box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.4);
+    margin-right: 5px;
+}
+
+.s-red {
+    background-color: #a00;
+}
+
+.s-green {
+    background-color: #0a0;
+}
+
+.s-blue {
+    background-color: #00a;
+}
+
+.s-black {
+    background-color: #222;
+}
+
+.s-white {
+    background-color: #fff;
+}
+
+.f-fin {
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAwIDExMDAiPg0KPHBhdGggZmlsbD0iI2ZmZiIgZD0ibTAsMGgxODAwdjExMDBoLTE4MDB6Ii8+DQo8ZyBmaWxsPSIjMDAzNTgwIj4NCjxwYXRoIGQ9Im0wLDQwMGgxODAwdjMwMGgtMTgwMHoiLz4NCjxwYXRoIGQ9Im0wLTgwMGgxMTAwdjMwMGgtMTEwMHoiIHRyYW5zZm9ybT0icm90YXRlKDkwKSIvPg0KPC9nPg0KPC9zdmc+DQo=");
+    background-size: contain;
+}
+
+.f-en {
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNjAgMzAiIGhlaWdodD0iNjAwIj4NCjxkZWZzPg0KPGNsaXBQYXRoIGlkPSJ0Ij4NCjxwYXRoIGQ9Im0zMCwxNWgzMHYxNXp2MTVoLTMwemgtMzB2LTE1enYtMTVoMzB6Ii8+DQo8L2NsaXBQYXRoPg0KPC9kZWZzPg0KPHBhdGggZmlsbD0iIzAwMjQ3ZCIgZD0ibTAsMHYzMGg2MHYtMzB6Ii8+DQo8cGF0aCBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgZD0ibTAsMGw2MCwzMG0wLTMwbC02MCwzMCIvPg0KPHBhdGggc3Ryb2tlPSIjY2YxNDJiIiBzdHJva2Utd2lkdGg9IjQiIGQ9Im0wLDBsNjAsMzBtMC0zMGwtNjAsMzAiIGNsaXAtcGF0aD0idXJsKCN0KSIvPg0KPHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIiBkPSJtMzAsMHYzMG0tMzAtMTVoNjAiLz4NCjxwYXRoIHN0cm9rZT0iI2NmMTQyYiIgc3Ryb2tlLXdpZHRoPSI2IiBkPSJtMzAsMHYzMG0tMzAtMTVoNjAiLz4NCjwvc3ZnPg0K");
+    background-size: contain;
+}
+
+.f-fin-box {
+    width: 25px;
+    height:15px;
+    border: 1px solid #000;
+}
+
+.f-en-box {
+    width: 28px;
+    height:15px;
+    border: 1px solid #000;
+}
+
+th, td {
+    padding: 10px;
+}
+
+#main {
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 50px;
+}
+
+#sortable1, #sortable2 {
+    border: 1px solid #eee;
+    width: 200px;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+    cursor: grab !important;
+}
+
+#sortable1 li, #sortable2 li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    width: 200px;
+}
+
+.grabbing {
+    cursor: grabbing !important;
+}
+
+.s-label {
+    font-size: 20px;
+}
+

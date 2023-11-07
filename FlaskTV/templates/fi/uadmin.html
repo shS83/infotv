@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}
+- User management
+{% endblock %}
+{% block content %}
+<div class="col-6">
+<h1>Käyttäjähallinta</h1>
+<br />
+<form method="POST">
+  {{ uadminform.hidden_tag() }}
+  <br />
+  {{ uadminform.user_list.label }}
+  <br /><br />
+  {{ uadminform.user_list(class_="form-control") }}
+  <br /><br />
+  <h5>Valittu käyttäjä: <span id="selected_user"></span></h5>
+  <br />
+  <button id="change_pass" data-bs-toggle="modal" data-bs-target="#Modal-UAdminConfirm-1" name="change_pass" class="btn btn-primary">Vaihda salasana</button>
+  <button id="delete_user" data-bs-toggle="modal" data-bs-target="#Modal-UAdminConfirm-1" name="delete_user" class="btn btn-danger">Poista käyttäjä</button>
+
+  <input type="hidden" id="todo" name="todo">
+  {% include 'fi/includes/uadmin_modal.html' %}
+</form>
+</div>
+<script language="JavaScript">
+
+  var cancelbutton = document.getElementById('cancel_modify');
+  var changepassbutton = document.getElementById('change_pass');
+  var deleteuserbutton = document.getElementById('delete_user');
+  var displaytext = document.getElementById('display-text');
+  var commentfield = document.getElementById('comments');
+  var todo = document.getElementById('todo');
+
+  changepassbutton.addEventListener("click", () => {
+    displaytext.innerText = "Käyttäjän " + $('#user_list').val() + " salasana vaihdetaan. \n\n Anna uusi salasana.";
+    commentfield.value = "";
+    todo.value = "change_pass";
+  });
+
+  deleteuserbutton.addEventListener("click", () => {
+    displaytext.innerText = "Käyttäjä " + $('#user_list').val() + " poistetaan. \n\n Kirjoita alla olevaan kenttään YES jatkaaksesi.";
+    commentfield.value = "";
+    todo.value = "delete";
+  });
+
+  cancelbutton.addEventListener("click", () => {
+    todo.value = '';
+    commentfield.value = '';
+  });
+
+  $(document).ready(function() {
+
+  commentfield.value = "";
+  $("#selected_user").text($('#user_list').val());
+
+  $("#user_list").change(function(event) {
+    $("#selected_user").text($(this).val());
+  });
+});
+</script>
+{% endblock %}

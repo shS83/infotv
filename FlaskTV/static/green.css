@@ -1,0 +1,79 @@
+body {
+    background-color: #102010;
+    color: #fff;
+    position: relative;
+}
+
+.s-base {
+    color: #fff;
+    background-color: #102010;
+}
+
+.s-accent {
+    color: #fff;
+    background-color: #223222;
+}
+
+.s-lighten {
+    color: #fff;
+    background-color: #1f2a1f;
+}
+
+.footer-bs {
+    background-color: #223222;
+    position: fixed;
+    width: 100%;
+    min-height: 30px;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+}
+
+.btn-outline-warning {
+    color: #aaa;
+    border-color: #454 !important;
+}
+
+.btn-outline-warning:hover {
+    background-color: #232 !important;
+    color: #ddd;
+}
+
+.btn-outline-warning:active {
+    background-color: #335 !important;
+}
+
+.btn-info {
+    background-color: #586 !important;
+    color: #fff;
+    border-color: #8e9 !important;
+}
+
+.btn-info:hover {
+    background-color: #374 !important;
+    color: #eee;
+    border-color: #6e7 !important;
+}
+
+.btn-success {
+    background-color: #295 !important;
+    color: #fff;
+    border-color: #7c5 !important;
+}
+
+.btn-success:hover {
+    background-color: #374 !important;
+    color: #eee;
+    border-color: #6b4 !important;
+}
+
+.btn-primary {
+    background-color: #3c3 !important;
+    color: #fff;
+    border-color: #7f7 !important;
+}
+
+.btn-primary:hover {
+    background-color: #2a2 !important;
+    border-color: #6e6 !important;
+}

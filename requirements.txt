@@ -1,0 +1,11 @@
+werkzeug==2.3.7
+flask
+flask_sqlalchemy
+flask_bcrypt
+flask_login
+flask_wtf
+wtforms
+sqlalchemy
+pytz
+tzlocal
+email_validator

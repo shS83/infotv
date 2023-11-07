@@ -1,0 +1,12 @@
+{% extends 'view_base.html' %}
+
+{% block head %}
+<meta http-equiv="Refresh" content="{{ page.time }}; URL={{ url_for('view_page', cur_idx=cur_idx) }}" />
+{% endblock %}
+{% block content %}
+<div class="logo"><img src="/static/infotv-logo-2.png"></div>
+<br />
+{% set current = 'info_pages/' + page.current %}
+{% include current %}
+
+{% endblock %}

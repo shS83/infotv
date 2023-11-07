@@ -1,0 +1,31 @@
+body {
+    background-color: #eee;
+    color: #000;
+    position: relative;
+}
+
+.s-base {
+    color: #000;
+    background-color: #ddd;
+}
+
+.s-accent {
+    color: #000;
+    background-color: #d5d5d5;
+}
+
+.s-lighten {
+    color: #000;
+    background-color: #bbb;
+}
+
+.footer-bs {
+    background-color: #d5d5d5;
+    color: #000;
+    position: fixed;
+    width: 100%;
+    min-height: 30px;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+}

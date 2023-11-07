@@ -1,0 +1,40 @@
+<style>
+  .modal-content {
+    background-color: #212121;
+  }
+</style>
+
+<!-- Save confirmation -->
+
+<div class="modal fade" id="Modal-SaveConfirm-1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-5" id="ConfirmLabel">
+          Tallennetaanko sivu?
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ designform.name.label }}
+        <br /><br />
+        {{ designform.name }}
+        <br /><br />
+        {{ designform.filename.label }}
+        <br /><br />
+        {{ designform.filename }}
+        <br /><br />
+        {{ designform.time.label }}
+        <br /><br />
+        {{ designform.time(min='1', max='60', default='10') }}
+        <br /> <br />
+      </div>
+      <div class="modal-footer">
+          {{ designform.submit(class="btn btn-primary me-auto btn-danger") }}
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Sulje
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

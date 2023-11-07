@@ -1,0 +1,33 @@
+<style>
+  .modal-content {
+    background-color: #212121;
+  }
+</style>
+
+<!-- Arrangement confirmation -->
+
+<div class="modal fade" id="Modal-ArrangeConfirm-2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-5" id="ConfirmLabel">
+          Tallennetaanko järjestys?
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Haluatko tallentaa tämän järjestyksen?
+      <br /> <br />
+        Lisää kommentti:
+      <br /> <br />
+        {{ arrangeform.comments }}
+      </div>
+      <div class="modal-footer">
+          {{ arrangeform.submit(class="btn btn-primary me-auto btn-danger") }}
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Sulje
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<style>
+  .modal-content {
+    background-color: #212121;
+  }
+</style>
+
+<!-- Page remove confirmation -->
+
+<div class="modal fade" id="Modal-UAdminConfirm-1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-5" id="ConfirmLabel">
+            Are you sure you want to modify user?
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <span id="display-text">User will be modified. Enter comments below.</span>
+        <br /><br />
+        {{ uadminform.comments }}
+        <br /> <br />
+      </div>
+      <div class="modal-footer">
+          {{ uadminform.submit(class="btn btn-primary me-auto btn-danger") }}
+        <button type="button" id="cancel_modify" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

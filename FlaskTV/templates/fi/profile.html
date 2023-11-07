@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}
+- Profiilisivu
+{% endblock %}
+{% block content %}
+{% if current_user.username == 'admin' %}
+<h1>Järjestelmänvalvojan sivut</h1>
+{% else %}
+<h1>Käyttäjän {{ current_user.username }} profiilisivu</h1>
+{% endif %}
+<br /><br />
+<form method="POST">
+{{ removeform.hidden_tag() }}
+{% if current_user.username == 'admin' %}
+<h3>Kaikki sivut</h3>
+<br />
+<table>
+    <tr class="fw-bold">
+        <td>Sivun nimi</td>
+        <td>Tiedoston nimi</td>
+        <td>Näyttöaika</td>
+        <td>Luoja</td>
+    </tr>
+{% for page in pages %}
+    <tr>
+    <td>{{ page.name }}</td>
+    <td>{{ page.file }}</td>
+    <td>{{ page.time }}</td>
+    <td>{{ page.creator.username }}</td>
+    {% if page.enabled %}
+    <td><button id="disable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Poista käytöstä</button></td>
+    {% else %}
+    <td><button id="enable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Ota käyttöön</button></td>
+    {% endif %}
+    <td><a href="{{ url_for('preview_page') }}?page={{ page.file }}" class="btn btn-info">Esikatsele</a></td>
+    <td><button id="edit-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Muokkaa</button></td>
+    <td><button id="rename-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Nimeä uudelleen</button></td>
+    <td><button id="delete-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Poista</button></td>
+    </tr>
+{% endfor %}
+</table>
+{% else %}
+<h3>Muokatut sivusi</h3>
+<br />
+<table>
+    <tr class="fw-bold">
+        <td>Sivun nimi</td>
+        <td>Tiedoston nimi</td>
+        <td>Näyttöaika</td>
+    </tr>
+{% for page in user.modified_pages %}
+    <tr>
+    <td>{{ page.name }}</td>
+    <td>{{ page.file }}</td>
+    <td>{{ page.time }}</td>
+    {% if page.enabled %}
+    <td><button id="disable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Poista käytöstä</button></td>
+    {% else %}
+    <td><button id="enable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Ota käyttöön</button></td>
+    {% endif %}
+    <td><a href="{{ url_for('preview_page') }}?page={{ page.file }}" class="btn btn-info">Esikatsele</a></td>
+    <td><button id="edit" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Muokkaa</button></td>
+    <td><button id="rename" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Nimeä uudelleen</button></td>
+    <td><button id="delete" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Poista</button></td>
+    </tr>
+{% endfor %}
+</table>
+{% endif %}
+<br />
+<a href="{{ url_for('upload_page') }}" class="btn btn-primary">Lähetä tiedosto</a>
+<br /><br /><br />
+<h4>Toimintaloki</h4>
+<br />
+{% if current_user.username == 'admin' %}
+<button class="btn btn-danger" id="clear_comments" name="clear_comments" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1">
+    Tyhjennä kommentit
+</button>
+<br /><br />
+{% endif %}
+<input type="hidden" id="admin_clear" name="admin_clear">
+<table>
+    <tr class="fw-bold">
+        <td>Kommentti</td>
+        <td>Toiminta</td>
+        <td>Sivu</td>
+        <td>Luoja</td>
+        <td>Koska tehty</td>
+    </tr>
+    {% for comment in comments|reverse %}
+    <tr>
+        <td>{{ comment.comment }}</td>
+        <td>{{ actions[comment.action] }}</td>
+        <td>{{ comment.pagefile_related }}</td>
+        <td>{{ comment.creator.username }} </td>
+        <td>{{ comment.time_created | datetimefilter }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<input type="hidden" id="torename" name="torename">
+<input type="hidden" id="toremove" name="toremove">
+<input type="hidden" id="todisable" name="todisable">
+<input type="hidden" id="toenable" name="toenable">
+<input type="hidden" id="toedit" name="toedit">
+
+ {% include 'fi/includes/remove_modal.html' %}
+
+<script language="JavaScript">
+
+function getElementsStartsWithId( id ) {
+  var children = document.body.getElementsByTagName('*');
+  var elements = [], child;
+  for (var i = 0, length = children.length; i < length; i++) {
+    child = children[i];
+    if (child.id.substr(0, id.length) == id)
+      elements.push(child);
+  }
+  return elements;
+}
+
+  var toremove = document.getElementById('toremove');
+  var todisable = document.getElementById('todisable');
+  var toenable = document.getElementById('toenable');
+  var torename = document.getElementById('torename');
+  var toedit = document.getElementById('toedit');
+  var cancelbutton = document.getElementById('cancel_modify');
+  var deletebuttons = getElementsStartsWithId('delete');
+  var disablebuttons = getElementsStartsWithId('disable');
+  var enablebuttons = getElementsStartsWithId('enable');
+  var renamebuttons = getElementsStartsWithId('rename');
+  var editbuttons = getElementsStartsWithId('edit');
+  var displaytext = document.getElementById('display-text');
+  var commentfield = document.getElementById('comments');
+
+  deletebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Sivu poistetaan pysyvästi. Lisää kommentti.';
+    commentfield.placeholder = 'Poistamisen syy';
+    toremove.value = x.name; }
+  ));
+
+  disablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Sivu poistetaan käytöstä. Lisää kommentti.';
+    commentfield.placeholder = 'Kirjoita kommentti';
+    todisable.value = x.name; }
+  ));
+
+  enablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Sivu otetaan käyttöön. Lisää kommentti.';
+    commentfield.placeholder = 'Kirjoita kommentti';
+    toenable.value = x.name; }
+  ));
+
+  renamebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Sivun kuvaus muutetaan. Anna uusi kuvaus.';
+    commentfield.placeholder = 'Kuvaus tähän';
+    torename.value = x.name; }
+  ));
+
+  editbuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Sivu avataan editorissa';
+    commentfield.placeholder = 'Kirjoita muokkauksen syy';
+    toedit.value = x.name; }
+  ));
+
+  cancelbutton.addEventListener("click", () => {
+    toremove.value = '';
+    todisable.value = '';
+    torename.value = '';
+    toedit.value = '';
+    commentfield.value = '';
+  });
+
+{% if current_user.username == 'admin' %}
+
+  var admin_clear_field = document.getElementById('admin_clear');
+  var admin_clear_button = document.getElementById('clear_comments');
+
+  admin_clear_button.addEventListener("click", () => {
+    displaytext.innerText = 'Kaikki kommentit tyhjennetään.';
+    commentfield.placeholder = 'Tyhjennä kaikki';
+    admin_clear_field.value = 'True'; });
+
+{% endif %}
+
+
+</script>
+
+</form>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}
+- Järjestyssivu
+{% endblock %}
+{% block content %}
+<h1>Muokkaa sivujen järjestystä</h1>
+<br />
+<form method="POST">
+    {{ arrangeform.hidden_tag() }}
+<div class="container s-accent w-50" style="margin:0px; padding:10px;">
+    <div class="row">
+        <div class="col">
+            Sivut näytöllä
+        </div>
+        <div class="col">
+            Sivuja saatavilla
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col">
+            <ul id="sortable1" class="connectedSortable s-lighten">
+            {% for page in pages %}
+                <li id="{{ page.file }}">{{ page.file }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="col">
+            <ul id="sortable2" class="connectedSortable s-lighten">
+            {% for index in range(files | length) %}
+                <li id="{{ files[index] }}">{{ files[index] }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<br />
+<input type="hidden" id="content" value="" name="arranged_items">
+<button class="btn btn-primary" id="go" data-bs-toggle="modal" data-bs-target="#Modal-ArrangeConfirm-2">Tallenna järjestys</button>
+<script language="javascript">
+ $( function() {
+
+    var sorts = $( "#sortable1, #sortable2" );
+    sorts.sortable({
+      connectWith: ".connectedSortable"
+    }).disableSelection();
+
+  });
+
+var $sortables = $("#sortable1, #sortable2").sortable({
+  stop: function() {
+    document.getElementById("content").value = $sortables.sortable("toArray");
+    }
+});
+</script>
+{% include 'fi/includes/arrange_modal.html' %}
+</form>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}
+- Suunnittelusivu
+{% endblock %}
+{% block content %}
+<h1>Suunnittelusivu</h1>
+<br />
+<link rel="stylesheet" href="https://kothing.github.io/editor/dist/css/kothing-editor.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+<script src="https://kothing.github.io/editor/dist/kothing-editor.min.js"></script>
+<form method="POST">
+    {{ designform.hidden_tag() }}
+<textarea id="editor_classic" style="display: none">
+    {% if page_to_edit %}
+        {{ page_to_edit }}
+    {% endif %}
+   </textarea>
+<input type="hidden" id="content" value="" name="editor_content">
+<br />
+<button id="go" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal-SaveConfirm-1">Tallenna</button>
+<br><br><br><Br><br>
+<script language="javascript">
+   var trueheight = window.innerHeight - 500;
+   trueheight = trueheight.toString() + "px";
+
+    var editor = KothingEditor.create("editor_classic", {
+  display: "block",
+  width: "100%",
+  height: "auto",
+  minHeight: trueheight,
+  popupDisplay: "full",
+  katex: katex,
+  fontSize: [16, 20, 26, 28, 36, 48, 72, 96, 100, 125, 150, 180, 250],
+  toolbarItem: [
+    ["undo", "redo"],
+    ["font", "fontSize", "formatBlock"],
+
+    [
+      "bold",
+      "underline",
+      "italic",
+      "strike",
+      "subscript",
+      "superscript",
+      "fontColor",
+      "hiliteColor"
+    ],
+    ["outdent", "indent", "align", "list", "horizontalRule"],
+    ["link", "table", "image", "audio", "video"],
+    ["lineHeight", "textStyle"],
+    ["showBlocks", "codeView"],
+    ["math"],
+    ["preview", "fullScreen"],
+    ["removeFormat"]
+  ],
+  charCounter: true,
+  callBackSave: (contents) => {
+    document.getElementById("content").value = contents;
+  }
+});
+
+document.getElementById("go").addEventListener("click", () => {
+  document.getElementById("content").value = editor.getContents();
+});
+</script>
+{% include 'fi/includes/save_modal.html' %}
+</form>
+{% endblock %}

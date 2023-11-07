@@ -1,0 +1,75 @@
+{% if request.cookies.get("theme") == "white" %}
+<nav class="navbar navbar-expand-md navbar-light s-accent">
+{% else %}
+<nav class="navbar navbar-expand-md navbar-dark s-accent">
+{% endif %}
+      <div class="container-fluid">
+      <a class="navbar-brand" href="#">INFOTV</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".multi-collapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse multi-collapse collapse w-100" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('home_page') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('design_page') }}">Design Page</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('arrange_page') }}">Arrange Pages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('timing_page') }}">Timing</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('view_page') }}">Info View</a>
+            </li>
+        </ul>
+        </div>
+        {% if current_user.is_authenticated %}
+        <div class="w-75 navbar-collapse multi-collapse collapse" id="navbarCred">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('profile_page') }}">Welcome, {{ current_user.username }}</a>
+            </li>
+            {% if current_user.username == 'admin' and current_user.id == 5 %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('uadmin_page') }}">User management</a>
+                </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('logout_page') }}">Logout</a>
+            </li>
+        </ul>
+      </div>
+        {% else %}
+      <div class="w-75 navbar-collapse collapse">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('login_page') }}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('register_page') }}">Register</a>
+            </li>
+        </ul>
+      </div>
+        {% endif %}
+    </div>
+    <div class="s-row">
+        <a href="/set/red"><div class="s-square s-red"></div></a>
+        <a href="/set/green"><div class="s-square s-green"></div></a>
+        <a href="/set/blue"><div class="s-square s-blue"></div></a>
+        <a href="/set/black"><div class="s-square s-black"></div></a>
+        <!-- <a href="/set/white"><div class="s-square s-white"></div></a> No-one likes white themes -->
+        <a href="/lang/fi">
+        <div class="f-fin-box">
+            <div class="f-fin"></div>
+        </div></a>
+        <a href="/lang/en">
+        <div class="f-en-box">
+            <div class="f-en"></div>
+        </div></a>
+    </div>
+    </nav>
+</nav>

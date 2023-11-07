@@ -1,0 +1,21 @@
+{% extends 'view_base.html' %}
+
+{% block head %}
+<img src="/static/infotv-logo-2.png" style="position:absolute; right:0;">
+{% endblock %}
+{% block content %}
+
+<div class="container">
+<table style="width: 1024px; height: 768px;">
+  <tr>
+    <td class="align-middle text-center">
+    {% if request.cookies.get("lang") == "fi" %}
+    <h1>Ole hyvä ja lisää sivuja näyttöön.</h1>
+    {% else %}
+    <h1>Please add some pages to view.</h1>
+    {% endif %}
+    </td>
+  </tr>
+</table>
+</div>
+{% endblock %}

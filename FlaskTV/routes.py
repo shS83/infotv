@@ -7,6 +7,8 @@ from FlaskTV import secure_filename
 from FlaskTV import exc
 import FlaskTV.langs as langs
 import os
+from datetime import datetime, timedelta
+from FlaskTV import scraper
 
 
 def do_pages_exist():
@@ -598,5 +600,20 @@ def preview_page():
         return render_template(f'preview.html', page=page)
     else:
         return redirect(url_for('home_page'))
+
+
+@app.route('/scraper')
+def scraper_page():
+    mod_timestamp = datetime.fromtimestamp(os.path.getmtime('FlaskTV/static/cache.html'))
+    current_timestamp = datetime.now()
+    diff = current_timestamp - mod_timestamp
+    print(f'Scrape created {diff} ago')
+    if diff > timedelta(minutes=15):
+        print('Timestamp old. Creating new scrape.')
+        scraper.execute()
+    else:
+        print('Page is fresh. Loading old cache file.')
+
+    return redirect(url_for('static', filename='cache.html'))
 
 

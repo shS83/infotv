@@ -602,18 +602,21 @@ def preview_page():
         return redirect(url_for('home_page'))
 
 
-@app.route('/scraper')
-def scraper_page():
-    mod_timestamp = datetime.fromtimestamp(os.path.getmtime('FlaskTV/static/cache.html'))
-    current_timestamp = datetime.now()
-    diff = current_timestamp - mod_timestamp
-    print(f'Scrape created {diff} ago')
-    if diff > timedelta(minutes=15):
-        print('Timestamp old. Creating new scrape.')
-        scraper.execute()
-    else:
-        print('Page is fresh. Loading old cache file.')
-
-    return redirect(url_for('static', filename='cache.html'))
-
-
+# @app.route('/scraper')
+# def scraper_page():
+#     mod_timestamp = datetime.fromtimestamp(os.path.getmtime('FlaskTV/static/cache.html'))
+#     current_timestamp = datetime.now()
+#     diff = current_timestamp - mod_timestamp
+#     print(f'Scrape created {diff} ago')
+#     if diff > timedelta(minutes=15):
+#         print('Timestamp old. Creating new scrape.')
+#         try:
+#             scraper.execute()
+#         except:
+#             return redirect(url_for('static', filename='cache.html'))
+#     else:
+#         print('Page is fresh. Loading old cache file.')
+#
+#     return redirect(url_for('static', filename='cache.html'))
+#
+#

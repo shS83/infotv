@@ -8,7 +8,6 @@ from FlaskTV import exc
 import FlaskTV.langs as langs
 import os
 from datetime import datetime, timedelta
-from FlaskTV import scraper
 
 
 def do_pages_exist():

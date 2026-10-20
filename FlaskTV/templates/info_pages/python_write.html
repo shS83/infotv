@@ -1,0 +1,42 @@
+<p>This final approach is more Pythonic and can be quicker and more <br>memory efficient. Therefore, it is suggested you use this instead.</p><p><strong>Note:</strong> Some of the above examples contain <code>print('some text', end='')</code>.  The <code>end=''</code> is to prevent Python from adding an additional newline to the text that is being printed and only <a href="https://realpython.com/courses/python-print/">print</a> what is being read from the file.</p><p>Now let’s dive into writing files.  As with reading files, file <br>objects have multiple methods that are useful for writing to a file:</p><div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><table><thead><tr><th><div>Method</div></th><th><div>What It Does</div></th></tr></thead><tbody><tr><td><div><code>.write(string)</code></div></td><td><div>This writes the string to the file.</div></td></tr><tr><td><div><code>.writelines(seq)</code></div></td><td><div>This writes the sequence to the file. No line endings are appended <br>to each sequence item.  It’s up to you to add the appropriate line <br>ending(s).</div></td></tr></tbody></table><br></div><p>Here’s a quick example of using <code>.write()</code> and <code>.writelines()</code>:</p><pre><code><span>with</span><span>open</span><span>(</span><span>'dog_breeds.txt'</span><span>,</span><span>'r'</span><span>)</span><span>as</span><span>reader</span><span>:</span><br>    <span># Note: readlines doesn't trim the line endings</span><br>    <span>dog_breeds</span><span>=</span><span>reader</span><span>.</span><span>readlines</span><span>()</span><br><br><span>with</span><span>open</span><span>(</span><span>'dog_breeds_reversed.txt'</span><span>,</span><span>'w'</span><span>)</span><span>as</span><span>writer</span><span>:</span><br>    <span># Alternatively you could use</span><br>    <span># writer.writelines(reversed(dog_breeds))</span><br><br>    <span># Write the dog breeds to the file in reversed order</span><br>    <span>for</span><span>breed</span><span>in</span><span>reversed</span><span>(</span><span>dog_breeds</span><span>):</span><br>        <span>writer</span><span>.</span><span>write</span><span>(</span><span>breed</span><span>)</span><br></code></pre><br><br><p>This final approach is more Pythonic and can be quicker and more 
+memory efficient. Therefore, it is suggested you use this instead.</p>
+<div class="alert alert-primary" role="alert">
+<p><strong>Note:</strong> Some of the above examples contain <code>print('some text', end='')</code>.  The <code>end=''</code> is to prevent Python from adding an additional newline to the text that is being printed and only <a href="https://realpython.com/courses/python-print/">print</a> what is being read from the file.</p>
+</div>
+<p>Now let’s dive into writing files.  As with reading files, file 
+objects have multiple methods that are useful for writing to a file:</p>
+<div class="table-responsive">
+<table class="table table-hover">
+<thead>
+<tr>
+<th>Method</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.write(string)</code></td>
+<td>This writes the string to the file.</td>
+</tr>
+<tr>
+<td><code>.writelines(seq)</code></td>
+<td>This writes the sequence to the file. No line endings are appended 
+to each sequence item.  It’s up to you to add the appropriate line 
+ending(s).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here’s a quick example of using <code>.write()</code> and <code>.writelines()</code>:</p>
+<div class="highlight python"><pre><span></span><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'dog_breeds.txt'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="c1"># Note: readlines doesn't trim the line endings</span>
+    <span class="n">dog_breeds</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'dog_breeds_reversed.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+    <span class="c1"># Alternatively you could use</span>
+    <span class="c1"># writer.writelines(reversed(dog_breeds))</span>
+
+    <span class="c1"># Write the dog breeds to the file in reversed order</span>
+    <span class="k">for</span> <span class="n">breed</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">dog_breeds</span><span class="p">):</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">breed</span><span class="p">)</span>
+</code></pre></div><p><br></p>

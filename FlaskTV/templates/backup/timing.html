@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Adjust page viewing time</h1>
+<br />
+<form method="POST">
+{{ timingform.hidden_tag() }}
+<div class="container w-50 s-accent" style="margin:0px; padding:5px;">
+    <div class="row">
+        <div class="col-8">
+            Pages on display
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-8">
+            <table>
+            {% for page in pages %}
+                <tr>
+                    <td>{{ page.file }}</td>
+                    <td><input type="number" name="file-{{ page.file }}" value="{{ page.time }}" min="0" max="60"></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+<br />
+{{ timingform.comments.label }}
+<br /><br />
+{{ timingform.comments }}
+<br /><br />
+{{ timingform.submit(class="btn btn-primary me-auto btn-primary") }}
+</form>
+{% endblock %}

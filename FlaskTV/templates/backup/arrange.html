@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block head %}
+
+{% endblock %}
+{% block content %}
+<style>
+  #sortable1, #sortable2 {
+    border: 1px solid #eee;
+    width: 200px;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+    cursor: grab !important;
+  }
+  #sortable1 li, #sortable2 li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    width: 200px;
+  }
+  .grabbing {
+  cursor: grabbing !important;
+  }
+
+</style>
+<h1>Arrange page order</h1>
+<br />
+<form method="POST">
+    {{ arrangeform.hidden_tag() }}
+<div class="container s-accent w-50" style="margin:0px; padding:10px;">
+    <div class="row">
+        <div class="col">
+            Pages on display
+        </div>
+        <div class="col">
+            Pages available
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col">
+            <ul id="sortable1" class="connectedSortable s-lighten">
+            {% for page in pages %}
+                <li id="{{ page.file }}">{{ page.file }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="col">
+            <ul id="sortable2" class="connectedSortable s-lighten">
+            {% for index in range(files | length) %}
+                <li id="{{ files[index] }}">{{ files[index] }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<br />
+<input type="hidden" id="content" value="" name="arranged_items">
+<button class="btn btn-primary" id="go" data-bs-toggle="modal" data-bs-target="#Modal-ArrangeConfirm-2">Save order</button>
+<script language="javascript">
+
+ $( function() {
+
+    var sorts = $( "#sortable1, #sortable2" );
+    sorts.sortable({
+      connectWith: ".connectedSortable"
+    }).disableSelection();
+
+  });
+
+var $sortables = $("#sortable1, #sortable2").sortable({
+  stop: function() {
+    document.getElementById("content").value = $sortables.sortable("toArray");
+    }
+});
+
+</script>
+{% include 'includes/arrange_modal.html' %}
+</form>
+{% endblock %}

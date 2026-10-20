@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if current_user.username == 'admin' %}
+<h1>Admin pages</h1>
+{% else %}
+<h1>Profile Page for {{ current_user.username }}</h1>
+{% endif %}
+<br /><br />
+<form method="POST">
+{{ removeform.hidden_tag() }}
+{% if current_user.username == 'admin' %}
+<h3>All pages</h3>
+<br />
+<table>
+    <tr>
+        <td>Page Name</td>
+        <td>File Name</td>
+        <td>Display Time</td>
+        <td>Creator</td>
+
+    </tr>
+{% for page in pages %}
+    <tr>
+    <td>{{ page.name }}</td>
+    <td>{{ page.file }}</td>
+    <td>{{ page.time }}</td>
+    <td>{{ page.creator.username }}</td>
+    {% if page.enabled %}
+    <td><button id="disable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-warning">Disable</button></td>
+    {% else %}
+    <td><button id="enable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Enable</button></td>
+    {% endif %}
+    <td><button id="edit-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Edit</button></td>
+    <td><button id="rename-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Rename</button></td>
+    <td><button id="delete-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Delete</button></td>
+    </tr>
+{% endfor %}
+</table>
+{% else %}
+<h3>Your modified pages</h3>
+<br />
+<table>
+    <tr>
+        <td>Page Name</td>
+        <td>File Name</td>
+        <td>Display Time</td>
+    </tr>
+{% for page in user.modified_pages %}
+    <tr>
+    <td>{{ page.name }}</td>
+    <td>{{ page.file }}</td>
+    <td>{{ page.time }}</td>
+    {% if page.enabled %}
+    <td><button id="disable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-warning">Disable</button></td>
+    {% else %}
+    <td><button id="enable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Enable</button></td>
+    {% endif %}
+    <td><button id="edit" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Edit</button></td>
+    <td><button id="rename" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Rename</button></td>
+    <td><button id="delete" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Delete</button></td>
+    </tr>
+{% endfor %}
+</table>
+{% endif %}
+<br />
+<a href="{{ url_for('upload_page') }}" class="btn btn-primary">Upload a file</a>
+<br /><br /><br />
+<h4>Your actions</h4>
+<br />
+{% if current_user.username == 'admin' %}
+<button class="btn btn-danger" id="clear_comments" name="clear_comments" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1">
+    Clear all comments
+</button>
+<br /><br />
+{% endif %}
+<input type="hidden" id="admin_clear" name="admin_clear">
+<table>
+    <tr>
+        <td>Comment</td>
+        <td>Action</td>
+        <td>Page related</td>
+        <td>Creator</td>
+        <td>Time Created</td>
+    </tr>
+    {% for comment in comments|reverse %}
+    <tr>
+        <td>{{ comment.comment }}</td>
+        <td>{{ comment.action }}</td>
+        <td>{{ comment.pagefile_related }}</td>
+        <td>{{ comment.creator.username }} </td>
+        <td>{{ comment.time_created | datetimefilter }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<input type="hidden" id="torename" name="torename">
+<input type="hidden" id="toremove" name="toremove">
+<input type="hidden" id="todisable" name="todisable">
+<input type="hidden" id="toenable" name="toenable">
+<input type="hidden" id="toedit" name="toedit">
+
+ {% include 'includes/remove_modal.html' %}
+
+<script language="JavaScript">
+
+function getElementsStartsWithId( id ) {
+  var children = document.body.getElementsByTagName('*');
+  var elements = [], child;
+  for (var i = 0, length = children.length; i < length; i++) {
+    child = children[i];
+    if (child.id.substr(0, id.length) == id)
+      elements.push(child);
+  }
+  return elements;
+}
+
+  var toremove = document.getElementById('toremove');
+  var todisable = document.getElementById('todisable');
+  var toenable = document.getElementById('toenable');
+  var torename = document.getElementById('torename');
+  var toedit = document.getElementById('toedit');
+  var deletebuttons = getElementsStartsWithId('delete');
+  var disablebuttons = getElementsStartsWithId('disable');
+  var enablebuttons = getElementsStartsWithId('enable');
+  var renamebuttons = getElementsStartsWithId('rename');
+  var editbuttons = getElementsStartsWithId('edit');
+  var displaytext = document.getElementById('display-text');
+  var commentfield = document.getElementById('comments');
+
+  deletebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Page will be deleted permanently! Enter comment below.';
+    toremove.value = x.name; }
+  ));
+
+  disablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Page will be disabled. Enter comment below.';
+    todisable.value = x.name; }
+  ));
+
+  enablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Page will be enabled. Enter comment below.';
+    toenable.value = x.name; }
+  ));
+
+  renamebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Page\'s description will be renamed. Enter new name below.';
+    torename.value = x.name; }
+  ));
+
+  editbuttons.forEach((x, i) => x.addEventListener('click', () => {
+    displaytext.innerText = 'Page will be opened in editor.';
+    commentfield.value = 'Editing';
+    toedit.value = x.name; }
+  ));
+
+{% if current_user.username == 'admin' %}
+
+  var admin_clear_field = document.getElementById('admin_clear');
+  var admin_clear_button = document.getElementById('clear_comments');
+
+  admin_clear_button.addEventListener("click", () => {
+    displaytext.innerText = 'All comments will be cleared!';
+    commentfield.placeholder = 'Clearing all';
+    admin_clear_field.value = 'True'; });
+
+{% endif %}
+
+
+</script>
+
+</form>
+{% endblock %}

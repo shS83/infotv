@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Upload Page</h1>
+<br />
+<h3>Send your page file</h3>
+<br />
+<div class="col-4">
+<form method="POST" enctype="multipart/form-data">
+    <label for="formFile" class="form-label">Accepted files are .html and .htm</label>
+    <input class="form-control" type="file" name="file-0" id="formFile">
+    <br />
+    <input type="submit" class="btn btn-primary" value="Upload">
+</form>
+</div>
+{% endblock %}

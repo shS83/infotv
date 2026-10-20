@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+    <style>
+    .f-fin {
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAwIDExMDAiPg0KPHBhdGggZmlsbD0iI2ZmZiIgZD0ibTAsMGgxODAwdjExMDBoLTE4MDB6Ii8+DQo8ZyBmaWxsPSIjMDAzNTgwIj4NCjxwYXRoIGQ9Im0wLDQwMGgxODAwdjMwMGgtMTgwMHoiLz4NCjxwYXRoIGQ9Im0wLTgwMGgxMTAwdjMwMGgtMTEwMHoiIHRyYW5zZm9ybT0icm90YXRlKDkwKSIvPg0KPC9nPg0KPC9zdmc+DQo=");
+    background-size: contain;
+    }
+    .f-en {
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNjAgMzAiIGhlaWdodD0iNjAwIj4NCjxkZWZzPg0KPGNsaXBQYXRoIGlkPSJ0Ij4NCjxwYXRoIGQ9Im0zMCwxNWgzMHYxNXp2MTVoLTMwemgtMzB2LTE1enYtMTVoMzB6Ii8+DQo8L2NsaXBQYXRoPg0KPC9kZWZzPg0KPHBhdGggZmlsbD0iIzAwMjQ3ZCIgZD0ibTAsMHYzMGg2MHYtMzB6Ii8+DQo8cGF0aCBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIgZD0ibTAsMGw2MCwzMG0wLTMwbC02MCwzMCIvPg0KPHBhdGggc3Ryb2tlPSIjY2YxNDJiIiBzdHJva2Utd2lkdGg9IjQiIGQ9Im0wLDBsNjAsMzBtMC0zMGwtNjAsMzAiIGNsaXAtcGF0aD0idXJsKCN0KSIvPg0KPHBhdGggc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIiBkPSJtMzAsMHYzMG0tMzAtMTVoNjAiLz4NCjxwYXRoIHN0cm9rZT0iI2NmMTQyYiIgc3Ryb2tlLXdpZHRoPSI2IiBkPSJtMzAsMHYzMG0tMzAtMTVoNjAiLz4NCjwvc3ZnPg0K");
+    background-size: contain;
+    }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    {% if request.cookies.get("theme") %}
+    <link rel="stylesheet" href="/static/{{ request.cookies.get('theme') }}.css" />
+    {% else %}
+    <link rel="stylesheet" href="/static/blue.css" />
+    {% endif %}
+    <link rel="stylesheet" href="/static/base.css" />
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark s-accent">
+      <div class="container-fluid">
+      <a class="navbar-brand" href="#">INFOTV</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".multi-collapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse multi-collapse collapse w-100" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('home_page') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('design_page') }}">Design Page</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('arrange_page') }}">Arrange Pages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('timing_page') }}">Timing</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('view_page') }}">Info View</a>
+            </li>
+        </ul>
+        </div>
+        {% if current_user.is_authenticated %}
+        <div class="w-75 navbar-collapse multi-collapse collapse" id="navbarCred">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('profile_page') }}">Welcome, {{ current_user.username }}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('logout_page') }}">Logout</a>
+            </li>
+        </ul>
+      </div>
+        {% else %}
+      <div class="w-75 navbar-collapse collapse">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('login_page') }}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('register_page') }}">Register</a>
+            </li>
+        </ul>
+      </div>
+        {% endif %}
+    </div>
+        <div class="row-s">
+            <a href="/set/red"><div class="square red"></div></a>
+            <a href="/set/green"><div class="square green"></div></a>
+            <a href="/set/blue"><div class="square blue"></div></a>
+            <a href="/set/black"><div class="square black"></div></a>
+            <a href="/lang/fi">
+            <div style="width: 25px; height:15px; border: 1px solid #000;">
+                <div class="f-fin"></div>
+            </div></a>
+            <a href="/lang/en">
+            <div style="width: 28px; height:15px; border: 1px solid #000;">
+                <div class="f-en"></div>
+            </div></a>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <br />
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br />
+    <div id="main">
+    {% block content %}
+
+
+    {% endblock %}
+    <script src="https://kit.fontawesome.com/c7e1e9f904.js" crossorigin="anonymous"></script>
+<!--    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  </div>
+  <footer class="footer-bs text-center text-white">
+  <!-- Copyright -->
+      <div class="text-center p-3">
+          version 1.05 © 2023 Copyright: shS
+      </div>
+  <!-- Copyright -->
+</footer>
+</body>
+</html>

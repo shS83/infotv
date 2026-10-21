@@ -1,0 +1,28 @@
+<form id="html-import-form" action="{{ url_for('import_html_page') }}" method="POST"
+      enctype="multipart/form-data" class="d-flex flex-wrap align-items-center gap-2 mb-4">
+    {{ importform.csrf_token(id='html-import-csrf') }}
+    {{ importform.html_file(id='html-import-file', accept='.html', required=true, hidden=true) }}
+    <button type="button" id="html-import-select" class="btn btn-secondary">Import a HTML</button>
+    <button type="submit" id="html-import-upload" class="btn btn-primary" disabled>Upload</button>
+    <button type="reset" class="btn btn-secondary">Cancel</button>
+    <span id="html-import-filename" aria-live="polite"></span>
+</form>
+<script>
+(() => {
+    const form = document.getElementById('html-import-form');
+    const fileInput = document.getElementById('html-import-file');
+    const uploadButton = document.getElementById('html-import-upload');
+    const filename = document.getElementById('html-import-filename');
+
+    document.getElementById('html-import-select').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        filename.textContent = fileInput.files.length ? fileInput.files[0].name : '';
+        uploadButton.disabled = !fileInput.files.length;
+    });
+    form.addEventListener('reset', () => {
+        fileInput.value = '';
+        filename.textContent = '';
+        uploadButton.disabled = true;
+    });
+})();
+</script>

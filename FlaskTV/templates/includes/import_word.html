@@ -1,0 +1,56 @@
+{% set finnish = request.cookies.get('lang') == 'fi' %}
+<form id="doc-import-form" action="{{ url_for('import_word_page') }}" method="POST"
+      enctype="multipart/form-data" class="mb-4" aria-describedby="doc-import-help">
+    {{ wordform.csrf_token(id='doc-import-csrf') }}
+    {{ wordform.word_file(id='doc-import-file', accept='.doc,.docx', required=true, hidden=true) }}
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" id="doc-import-select" class="btn btn-secondary">Import a DOC/DOCX File</button>
+        <button type="submit" id="doc-import-upload" class="btn btn-primary" disabled>Upload</button>
+        <button type="reset" id="doc-import-cancel" class="btn btn-secondary">Cancel</button>
+        <span id="doc-import-filename" aria-live="polite"></span>
+        <span id="doc-import-status" role="status"></span>
+    </div>
+    <p id="doc-import-help" class="mt-2">
+        {% if finnish %}
+        Jokainen asiakirjan sivu tuodaan kuvana. Muokkaa sisältöä Wordissa ennen uutta tuontia.
+        Enintään 50 Mt ja 100 sivua. Muunnos voi kestää muutaman minuutin.
+        {% else %}
+        Each document page is imported as an image. Edit the content in Word before importing again.
+        Maximum 50 MB and 100 pages. Conversion may take a few minutes.
+        {% endif %}
+    </p>
+</form>
+<script>
+(() => {
+    const form = document.getElementById('doc-import-form');
+    const fileInput = document.getElementById('doc-import-file');
+    const selectButton = document.getElementById('doc-import-select');
+    const uploadButton = document.getElementById('doc-import-upload');
+    const cancelButton = document.getElementById('doc-import-cancel');
+    const filename = document.getElementById('doc-import-filename');
+    const status = document.getElementById('doc-import-status');
+    let uploading = false;
+
+    selectButton.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        filename.textContent = fileInput.files.length ? fileInput.files[0].name : '';
+        uploadButton.disabled = !fileInput.files.length;
+    });
+    form.addEventListener('reset', () => {
+        fileInput.value = '';
+        filename.textContent = '';
+        status.textContent = '';
+        uploadButton.disabled = true;
+    });
+    form.addEventListener('submit', (event) => {
+        if (uploading) {
+            event.preventDefault();
+            return;
+        }
+        uploading = true;
+        selectButton.disabled = uploadButton.disabled = cancelButton.disabled = true;
+        form.setAttribute('aria-busy', 'true');
+        status.textContent = {{ ('Muunnetaan asiakirjaa…' if finnish else 'Converting document…') | tojson }};
+    });
+})();
+</script>

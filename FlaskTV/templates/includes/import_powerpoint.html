@@ -1,0 +1,56 @@
+{% set finnish = request.cookies.get('lang') == 'fi' %}
+<form id="ppt-import-form" action="{{ url_for('import_powerpoint_page') }}" method="POST"
+      enctype="multipart/form-data" class="mb-4" aria-describedby="ppt-import-help">
+    {{ powerpointform.csrf_token(id='ppt-import-csrf') }}
+    {{ powerpointform.powerpoint_file(id='ppt-import-file', accept='.ppt,.pptx', required=true, hidden=true) }}
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" id="ppt-import-select" class="btn btn-secondary">Import a PPT/PPTX file</button>
+        <button type="submit" id="ppt-import-upload" class="btn btn-primary" disabled>Upload</button>
+        <button type="reset" id="ppt-import-cancel" class="btn btn-secondary">Cancel</button>
+        <span id="ppt-import-filename" aria-live="polite"></span>
+        <span id="ppt-import-status" role="status"></span>
+    </div>
+    <p id="ppt-import-help" class="mt-2">
+        {% if finnish %}
+        Jokaisesta diasta luodaan oma sivu kuvana. Animaatiot ja videot eivät toistu.
+        Enintään 50 Mt ja 100 diaa. Muunnos voi kestää muutaman minuutin.
+        {% else %}
+        Each slide becomes a separate page as an image. Animations and videos do not play.
+        Maximum 50 MB and 100 slides. Conversion may take a few minutes.
+        {% endif %}
+    </p>
+</form>
+<script>
+(() => {
+    const form = document.getElementById('ppt-import-form');
+    const fileInput = document.getElementById('ppt-import-file');
+    const selectButton = document.getElementById('ppt-import-select');
+    const uploadButton = document.getElementById('ppt-import-upload');
+    const cancelButton = document.getElementById('ppt-import-cancel');
+    const filename = document.getElementById('ppt-import-filename');
+    const status = document.getElementById('ppt-import-status');
+    let uploading = false;
+
+    selectButton.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        filename.textContent = fileInput.files.length ? fileInput.files[0].name : '';
+        uploadButton.disabled = !fileInput.files.length;
+    });
+    form.addEventListener('reset', () => {
+        fileInput.value = '';
+        filename.textContent = '';
+        status.textContent = '';
+        uploadButton.disabled = true;
+    });
+    form.addEventListener('submit', (event) => {
+        if (uploading) {
+            event.preventDefault();
+            return;
+        }
+        uploading = true;
+        selectButton.disabled = uploadButton.disabled = cancelButton.disabled = true;
+        form.setAttribute('aria-busy', 'true');
+        status.textContent = {{ ('Muunnetaan dioja…' if finnish else 'Converting slides…') | tojson }};
+    });
+})();
+</script>

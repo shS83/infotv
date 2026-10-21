@@ -28,14 +28,14 @@
     <td>{{ page.time }}</td>
     <td>{{ page.creator.username }}</td>
     {% if page.enabled %}
-    <td><button id="disable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Disable</button></td>
+    <td><button type="button" id="disable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Disable</button></td>
     {% else %}
-    <td><button id="enable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Enable</button></td>
+    <td><button type="button" id="enable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Enable</button></td>
     {% endif %}
     <td><a href="{{ url_for('preview_page') }}?page={{ page.file }}" class="btn btn-info">Preview</a></td>
-    <td><button id="edit-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Edit</button></td>
-    <td><button id="rename-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Rename</button></td>
-    <td><button id="delete-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Delete</button></td>
+    <td><button type="button" id="edit-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Edit</button></td>
+    <td><button type="button" id="rename-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Rename</button></td>
+    <td><button type="button" id="delete-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Delete</button></td>
     </tr>
 {% endfor %}
 </table>
@@ -54,14 +54,14 @@
     <td>{{ page.file }}</td>
     <td>{{ page.time }}</td>
     {% if page.enabled %}
-    <td><button id="disable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Disable</button></td>
+    <td><button type="button" id="disable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Disable</button></td>
     {% else %}
-    <td><button id="enable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Enable</button></td>
+    <td><button type="button" id="enable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Enable</button></td>
     {% endif %}
     <td><a href="{{ url_for('preview_page') }}?page={{ page.file }}" class="btn btn-info">Preview</a></td>
-    <td><button id="edit" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Edit</button></td>
-    <td><button id="rename" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Rename</button></td>
-    <td><button id="delete" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Delete</button></td>
+    <td><button type="button" id="edit" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Edit</button></td>
+    <td><button type="button" id="rename" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Rename</button></td>
+    <td><button type="button" id="delete" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Delete</button></td>
     </tr>
 {% endfor %}
 </table>
@@ -72,7 +72,7 @@
 <h4>Your actions</h4>
 <br />
 {% if current_user.username == 'admin' %}
-<button class="btn btn-danger" id="clear_comments" name="clear_comments" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1">
+<button type="button" class="btn btn-danger" id="clear_comments" name="clear_comments" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1">
     Clear all comments
 </button>
 <br /><br />
@@ -132,30 +132,35 @@ function getElementsStartsWithId( id ) {
   var commentfield = document.getElementById('comments');
 
   deletebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Page will be deleted permanently! Enter comment below.';
     commentfield.placeholder = 'Enter reason';
     toremove.value = x.name; }
   ));
 
   disablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Page will be disabled. Enter comment below.';
     commentfield.placeholder = 'Enter comment';
     todisable.value = x.name; }
   ));
 
   enablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Page will be enabled. Enter comment below.';
     commentfield.placeholder = 'Enter comment';
     toenable.value = x.name; }
   ));
 
   renamebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = true;
     displaytext.innerText = 'Page\'s description will be renamed. Enter new name below.';
     commentfield.placeholder = 'New name here';
     torename.value = x.name; }
   ));
 
   editbuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Page will be opened in editor.';
     commentfield.placeholder = 'Enter reason for modifying';
     toedit.value = x.name; }
@@ -175,6 +180,7 @@ function getElementsStartsWithId( id ) {
   var admin_clear_button = document.getElementById('clear_comments');
 
   admin_clear_button.addEventListener("click", () => {
+    commentfield.required = false;
     displaytext.innerText = 'All comments will be cleared!';
     commentfield.placeholder = 'Clearing all';
     admin_clear_field.value = 'True'; });

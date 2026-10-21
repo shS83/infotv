@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, IntegerField, SelectField
-from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
+from wtforms.validators import Length, EqualTo, Email, DataRequired, Optional, ValidationError
 from FlaskTV.models import User
 
 
@@ -60,6 +61,18 @@ class LoginForm_fi(FlaskForm):
     submit = SubmitField(label='Kirjaudu sisään')
 
 
+class HTMLImportForm(FlaskForm):
+    html_file = FileField(validators=[FileRequired(), FileAllowed(['html'])])
+
+
+class PowerPointImportForm(FlaskForm):
+    powerpoint_file = FileField(validators=[FileRequired(), FileAllowed(['ppt', 'pptx'])])
+
+
+class WordImportForm(FlaskForm):
+    word_file = FileField(validators=[FileRequired(), FileAllowed(['doc', 'docx'])])
+
+
 class DesignForm(FlaskForm):
     name = StringField(label='Page description:', validators=[DataRequired()])
     filename = StringField(label='File name to save:', validators=[DataRequired()])
@@ -75,32 +88,32 @@ class DesignForm_fi(FlaskForm):
 
 
 class ArrangeForm(FlaskForm):
-    comments = StringField(label='Comment to add:', validators=[DataRequired()])
+    comments = StringField(label='Comment to add:', validators=[Optional()])
     submit = SubmitField(label='Save order')
 
 
 class ArrangeForm_fi(FlaskForm):
-    comments = StringField(label='Lisää kommentti:', validators=[DataRequired()])
+    comments = StringField(label='Lisää kommentti:', validators=[Optional()])
     submit = SubmitField(label='Tallenna järjestys')
 
 
 class RemoveForm(FlaskForm):
-    comments = StringField(label='Comment to add:', validators=[DataRequired()])
+    comments = StringField(label='Comment to add:', validators=[Optional()])
     submit = SubmitField(label='Modify')
 
 
 class RemoveForm_fi(FlaskForm):
-    comments = StringField(label='Lisää kommentti:', validators=[DataRequired()])
+    comments = StringField(label='Lisää kommentti:', validators=[Optional()])
     submit = SubmitField(label='Muokkaa')
 
 
 class TimingForm(FlaskForm):
-    comments = StringField(label='Comment to add:', validators=[DataRequired()])
+    comments = StringField(label='Comment to add:', validators=[Optional()])
     submit = SubmitField(label='Save timing')
 
 
 class TimingForm_fi(FlaskForm):
-    comments = StringField(label='Lisää kommentti:', validators=[DataRequired()])
+    comments = StringField(label='Lisää kommentti:', validators=[Optional()])
     submit = SubmitField(label='Tallenna ajastus')
 
 

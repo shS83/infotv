@@ -1,6 +1,14 @@
 from FlaskTV import app
 from flask import render_template, redirect, url_for, flash, request, make_response
 from FlaskTV.models import Page, User, Comment
+from FlaskTV.forms import HTMLImportForm, PowerPointImportForm, WordImportForm
+from FlaskTV.office import MAX_UPLOAD_BYTES, OfficeImportError
+from FlaskTV.powerpoint import convert_slides, slide_html
+from FlaskTV.word import convert_word_pages, word_page_html
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from uuid import uuid4
+from werkzeug.exceptions import RequestEntityTooLarge
 from FlaskTV import db
 from flask_login import login_user, logout_user, login_required, current_user
 from FlaskTV import secure_filename
@@ -223,7 +231,117 @@ def design_page():
         return redirect(url_for('design_page'))
 
     return render_template(f'{langs.PREFIX}/design.html', designform=designform, page_to_edit=page_to_edit,
-                           editpage_query=editpage_query)
+                           editpage_query=editpage_query, importform=HTMLImportForm(),
+                           powerpointform=PowerPointImportForm(), wordform=WordImportForm())
+
+
+@app.route('/design/import', methods=['POST'])
+@login_required
+def import_html_page():
+    lang = get_lang_prefix()
+    form = HTMLImportForm()
+    if not form.validate_on_submit():
+        flash(langs.MESSAGES[lang]['invalid_import'], category='danger')
+        return redirect(url_for('design_page'))
+
+    uploaded_file = form.html_file.data
+    filename = secure_filename(uploaded_file.filename)
+    if not filename or not allowed_file(filename, {'html'}):
+        flash(langs.MESSAGES[lang]['invalid_import'], category='danger')
+        return redirect(url_for('design_page'))
+
+    file_path = os.path.join(app.root_path, 'templates', 'info_pages', filename)
+    try:
+        with open(file_path, 'xb') as destination:
+            uploaded_file.save(destination)
+    except FileExistsError:
+        flash(f'{filename} {langs.MESSAGES[lang]["file_exists"]}', category='danger')
+        return redirect(url_for('design_page'))
+    except OSError:
+        flash(langs.MESSAGES[lang]['io_err'], category='danger')
+        return redirect(url_for('design_page'))
+
+    comment = Comment(owner=current_user.id, comment='File upload', action='Upload',
+                      pagefile_related=filename)
+    db_add_comment(comment)
+    flash(f'{filename} {langs.MESSAGES[lang]["send_success"]}', category='success')
+    return redirect(url_for('design_page'))
+
+
+@app.route('/design/import-powerpoint', methods=['POST'])
+@login_required
+def import_powerpoint_page():
+    return _import_office_file('ppt')
+
+
+@app.route('/design/import-word', methods=['POST'])
+@login_required
+def import_word_page():
+    return _import_office_file('doc')
+
+
+def _import_office_file(kind):
+    options = {
+        'ppt': dict(form=PowerPointImportForm, field='powerpoint_file', extensions={'ppt', 'pptx'},
+                    convert=convert_slides, render=slide_html, label='slide', name='PowerPoint'),
+        'doc': dict(form=WordImportForm, field='word_file', extensions={'doc', 'docx'},
+                    convert=convert_word_pages, render=word_page_html, label='page', name='Word'),
+    }[kind]
+    lang = get_lang_prefix()
+    created_files = []
+    try:
+        # Allow room for multipart headers while limiting the uploaded file itself below.
+        request.max_content_length = MAX_UPLOAD_BYTES + 1024 * 1024
+        form = options['form']()
+        if not form.validate_on_submit():
+            raise OfficeImportError(f'{kind}_invalid')
+        upload = getattr(form, options['field']).data
+        filename = secure_filename(upload.filename)
+        if not filename or not allowed_file(filename, options['extensions']):
+            raise OfficeImportError(f'{kind}_invalid')
+
+        with TemporaryDirectory(prefix=f'infotv-{kind}-') as temp_dir:
+            work_dir = Path(temp_dir)
+            source = work_dir / ('document' + Path(filename).suffix.lower())
+            with source.open('wb') as destination:
+                total = 0
+                while chunk := upload.stream.read(1024 * 1024):
+                    total += len(chunk)
+                    if total > MAX_UPLOAD_BYTES:
+                        raise OfficeImportError(f'{kind}_too_large')
+                    destination.write(chunk)
+            pages = options['convert'](source, work_dir)
+            stem = Path(filename).stem[:100]
+            batch = uuid4().hex[:12]
+            page_dir = Path(app.root_path) / 'templates' / 'info_pages'
+            for index, image in enumerate(pages, start=1):
+                page_filename = f'{stem}-{batch}-{options["label"]}-{index:03d}.html'
+                title = f'{stem} – {index}'
+                path = page_dir / page_filename
+                with path.open('x', encoding='utf-8') as destination:
+                    created_files.append(path)
+                    destination.write(options['render'](image, title))
+                db.session.add(Page(name=title, file=page_filename, time=10,
+                                    owner=current_user.id, enabled=False))
+                db.session.add(Comment(owner=current_user.id, comment=f'{options["name"]} import',
+                                       action='Upload', pagefile_related=page_filename))
+        # Publish the database rows only after all page files have been written.
+        db.session.commit()
+        flash(langs.MESSAGES[lang][f'{kind}_success'].format(count=len(pages)), category='success')
+        return redirect(url_for('design_page'))
+    except RequestEntityTooLarge:
+        message = f'{kind}_too_large'
+    except OfficeImportError as error:
+        message = str(error)
+    except (OSError, exc.SQLAlchemyError):
+        app.logger.exception('%s import could not be saved', options['name'])
+        message = f'{kind}_failed'
+
+    db.session.rollback()
+    for path in created_files:
+        path.unlink(missing_ok=True)
+    flash(langs.MESSAGES[lang][message], category='danger')
+    return redirect(url_for('design_page'))
 
 
 @app.route('/arrange', methods=['GET', 'POST'])
@@ -255,7 +373,7 @@ def arrange_page():
 
     if request.method == 'POST':
         arrangement = request.form.get('arranged_items').split(',')
-        comment = request.form.get('comments')
+        comment = (request.form.get('comments') or '').strip() or '-'
 
         if arrangement == ['']:
 
@@ -322,9 +440,7 @@ def timing_page():
 
     if request.method == 'POST':
         content = request.form
-        comment_text = content.get('comments')
-        if comment_text is None:
-            comment_text = 'No comment'
+        comment_text = (content.get('comments') or '').strip() or '-'
 
         for k, v in content.items():
             if k[0:5] == 'file-':
@@ -425,7 +541,7 @@ def profile_page():
         file_to_enable = content.get('toenable')[7:]
         file_to_rename = content.get('torename')[7:]
         file_to_edit = content.get('toedit')[5:]
-        comment_text = content.get('comments')
+        comment_text = (content.get('comments') or '').strip() or '-'
 
         if len(file_to_edit) > 0:
             comment_to_add = Comment(owner=current_user.id,
@@ -435,6 +551,9 @@ def profile_page():
             return redirect(url_for('design_page') + '?edit=' + file_to_edit)
 
         if len(file_to_rename) > 0:
+            if not (content.get('comments') or '').strip():
+                flash(langs.MESSAGES[langs.PREFIX]['name_required'], category='danger')
+                return redirect(url_for('profile_page'))
             page = Page.query.filter_by(file=file_to_rename).first()
             page.name = comment_text
             comment_to_add = Comment(owner=current_user.id,

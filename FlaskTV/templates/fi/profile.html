@@ -28,14 +28,14 @@
     <td>{{ page.time }}</td>
     <td>{{ page.creator.username }}</td>
     {% if page.enabled %}
-    <td><button id="disable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Poista käytöstä</button></td>
+    <td><button type="button" id="disable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Poista käytöstä</button></td>
     {% else %}
-    <td><button id="enable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Ota käyttöön</button></td>
+    <td><button type="button" id="enable-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Ota käyttöön</button></td>
     {% endif %}
     <td><a href="{{ url_for('preview_page') }}?page={{ page.file }}" class="btn btn-info">Esikatsele</a></td>
-    <td><button id="edit-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Muokkaa</button></td>
-    <td><button id="rename-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Nimeä uudelleen</button></td>
-    <td><button id="delete-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Poista</button></td>
+    <td><button type="button" id="edit-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Muokkaa</button></td>
+    <td><button type="button" id="rename-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Nimeä uudelleen</button></td>
+    <td><button type="button" id="delete-admin" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Poista</button></td>
     </tr>
 {% endfor %}
 </table>
@@ -54,14 +54,14 @@
     <td>{{ page.file }}</td>
     <td>{{ page.time }}</td>
     {% if page.enabled %}
-    <td><button id="disable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Poista käytöstä</button></td>
+    <td><button type="button" id="disable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="disable-{{ page.file }}" class="btn btn-outline-warning">Poista käytöstä</button></td>
     {% else %}
-    <td><button id="enable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Ota käyttöön</button></td>
+    <td><button type="button" id="enable" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="enable-{{ page.file }}" class="btn btn-primary">Ota käyttöön</button></td>
     {% endif %}
     <td><a href="{{ url_for('preview_page') }}?page={{ page.file }}" class="btn btn-info">Esikatsele</a></td>
-    <td><button id="edit" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Muokkaa</button></td>
-    <td><button id="rename" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Nimeä uudelleen</button></td>
-    <td><button id="delete" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Poista</button></td>
+    <td><button type="button" id="edit" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="edit-{{ page.file }}" class="btn btn-info">Muokkaa</button></td>
+    <td><button type="button" id="rename" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="rename-{{ page.file }}" class="btn btn-success">Nimeä uudelleen</button></td>
+    <td><button type="button" id="delete" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1" name="delete-{{ page.file }}" class="btn btn-danger">Poista</button></td>
     </tr>
 {% endfor %}
 </table>
@@ -72,7 +72,7 @@
 <h4>Toimintaloki</h4>
 <br />
 {% if current_user.username == 'admin' %}
-<button class="btn btn-danger" id="clear_comments" name="clear_comments" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1">
+<button type="button" class="btn btn-danger" id="clear_comments" name="clear_comments" data-bs-toggle="modal" data-bs-target="#Modal-RemoveConfirm-1">
     Tyhjennä kommentit
 </button>
 <br /><br />
@@ -132,30 +132,35 @@ function getElementsStartsWithId( id ) {
   var commentfield = document.getElementById('comments');
 
   deletebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Sivu poistetaan pysyvästi. Lisää kommentti.';
     commentfield.placeholder = 'Poistamisen syy';
     toremove.value = x.name; }
   ));
 
   disablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Sivu poistetaan käytöstä. Lisää kommentti.';
     commentfield.placeholder = 'Kirjoita kommentti';
     todisable.value = x.name; }
   ));
 
   enablebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Sivu otetaan käyttöön. Lisää kommentti.';
     commentfield.placeholder = 'Kirjoita kommentti';
     toenable.value = x.name; }
   ));
 
   renamebuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = true;
     displaytext.innerText = 'Sivun kuvaus muutetaan. Anna uusi kuvaus.';
     commentfield.placeholder = 'Kuvaus tähän';
     torename.value = x.name; }
   ));
 
   editbuttons.forEach((x, i) => x.addEventListener('click', () => {
+    commentfield.required = false;
     displaytext.innerText = 'Sivu avataan editorissa';
     commentfield.placeholder = 'Kirjoita muokkauksen syy';
     toedit.value = x.name; }
@@ -175,6 +180,7 @@ function getElementsStartsWithId( id ) {
   var admin_clear_button = document.getElementById('clear_comments');
 
   admin_clear_button.addEventListener("click", () => {
+    commentfield.required = false;
     displaytext.innerText = 'Kaikki kommentit tyhjennetään.';
     commentfield.placeholder = 'Tyhjennä kaikki';
     admin_clear_field.value = 'True'; });

@@ -101,10 +101,10 @@ def set_lang(lang='fi'):
             langs.PREFIX = lang
             return res
         else:
-            print('ERROR: Language not implemented. Defaulting to english.')
+            print('ERROR: Language not implemented. Defaulting to Finnish.')
             res = make_response(redirect(safe_redirect))
-            res.set_cookie('lang', 'en')
-            langs.PREFIX = 'en'
+            res.set_cookie('lang', 'fi')
+            langs.PREFIX = 'fi'
             return res
     else:
         return redirect(url_for('home_page'))

@@ -53,9 +53,9 @@ def do_pages_exist():
 
 
 def get_lang_prefix():
-    lang_prefix = 'en'
-    if request.cookies.get('lang') == 'fi':
-        lang_prefix = 'fi'
+    lang_prefix = 'fi'
+    if request.cookies.get('lang') == 'en':
+        lang_prefix = 'en'
     langs.PREFIX = lang_prefix
     return lang_prefix
 
@@ -92,7 +92,7 @@ def set_theme(theme='blue'):
 
 @app.route('/lang')
 @app.route('/lang/<lang>')
-def set_lang(lang='en'):
+def set_lang(lang='fi'):
     safe_redirect = safe_local_redirect(request.referrer)
     if safe_redirect:
         if lang in langs.LANGUAGES:

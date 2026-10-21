@@ -45,6 +45,19 @@ mutta PDF-vienti tehdään LibreOffice Writerilla. Asiakirjoja ei lähetetä
 ulkoiseen palveluun. Jokainen muunnos käyttää erillistä väliaikaista profiilia,
 jossa makrojen suojaustaso on Very High.
 
+## Tuontivirheen selvittäminen
+
+Yleinen tuontivirhe ei yksin tarkoita, että asiakirja olisi viallinen tai
+salasanalla suojattu. Myös palvelimen muunnosohjelman käynnistys voi epäonnistua.
+Muunnosvirheen yhteydessä palvelimen lokiin kirjataan ohjelma, paluukoodi sekä
+ohjelman tuloste ja virhetuloste (enintään 4000 tavua kummastakin). Lokimerkintä
+alkaa tekstillä `doc import:`. Myös puuttuva PDF kirjataan, vaikka LibreOffice
+palauttaisi onnistumista tarkoittavan paluukoodin.
+
+Jos tiedosto avautuu Writerissa mutta tuonti epäonnistuu, tarkista loki siitä
+päätteestä tai palvelusta, jossa Flask on käynnistetty. Muunnoksen täytyy toimia
+samalla käyttäjällä ja samoilla käyttöoikeuksilla kuin Flask-palvelu.
+
 ## Testaus
 
 ```sh

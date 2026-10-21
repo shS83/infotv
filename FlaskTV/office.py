@@ -2,6 +2,7 @@
 
 import base64
 from html import escape
+import logging
 import os
 from pathlib import Path
 import shutil
@@ -12,18 +13,19 @@ from zipfile import BadZipFile, ZipFile
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 CONVERSION_TIMEOUT = 120
+logger = logging.getLogger(__name__)
 
 
 class OfficeImportError(Exception):
     """The message key is translated by the upload route."""
 
 
-def _run(command, error_prefix):
+def _run(command, error_prefix, *, expected_output=None):
     try:
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                               start_new_session=True) as process:
             try:
-                process.communicate(timeout=CONVERSION_TIMEOUT)
+                stdout, stderr = process.communicate(timeout=CONVERSION_TIMEOUT)
             except subprocess.TimeoutExpired as error:
                 # LibreOffice launches child processes; stop the whole conversion on timeout.
                 try:
@@ -31,10 +33,21 @@ def _run(command, error_prefix):
                 except ProcessLookupError:
                     pass
                 process.communicate()
+                logger.warning('%s import: %s timed out after %s seconds',
+                               error_prefix, command[0], CONVERSION_TIMEOUT)
                 raise OfficeImportError(f'{error_prefix}_timeout') from error
-            if process.returncode:
+            # LibreOffice can return success even when it could not open the document.
+            missing_output = expected_output is not None and (
+                not expected_output.is_file() or not expected_output.stat().st_size)
+            if process.returncode or missing_output:
+                logger.warning(
+                    '%s import: %s failed (exit=%s, missing_output=%s). stdout=%r stderr=%r',
+                    error_prefix, command[0], process.returncode, missing_output,
+                    stdout[-4000:].decode('utf-8', errors='replace'),
+                    stderr[-4000:].decode('utf-8', errors='replace'))
                 raise OfficeImportError(f'{error_prefix}_failed')
     except OSError as error:
+        logger.warning('%s import: could not run %s: %s', error_prefix, command[0], error)
         raise OfficeImportError(f'{error_prefix}_failed') from error
 
 
@@ -70,12 +83,10 @@ def convert_pages(source, work_dir, *, extensions, document_entry, pdf_filter,
         '<item oor:path="/org.openoffice.Office.Common/Security/Scripting">'
         '<prop oor:name="MacroSecurityLevel" oor:op="fuse"><value>3</value></prop>'
         '</item></oor:items>', encoding='utf-8')
-    _run([office, f'-env:UserInstallation={profile.as_uri()}', '--headless',
-          '--convert-to', f'pdf:{pdf_filter}', '--outdir', str(work_dir), str(source)], error_prefix)
     pdf = work_dir / f'{source.stem}.pdf'
-    # LibreOffice can return success even when it could not open the document.
-    if not pdf.is_file() or not pdf.stat().st_size:
-        raise OfficeImportError(f'{error_prefix}_failed')
+    _run([office, f'-env:UserInstallation={profile.as_uri()}', '--headless',
+          '--convert-to', f'pdf:{pdf_filter}', '--outdir', str(work_dir), str(source)],
+         error_prefix, expected_output=pdf)
 
     _run([renderer, '-png', '-scale-to', '1920', '-l', str(max_pages + 1),
           str(pdf), str(work_dir / image_prefix)], error_prefix)

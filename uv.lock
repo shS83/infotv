@@ -202,6 +202,7 @@ dependencies = [
     { name = "pytz" },
     { name = "sqlalchemy" },
     { name = "tzlocal" },
+    { name = "werkzeug" },
     { name = "wtforms" },
 ]
 
@@ -217,6 +218,7 @@ requires-dist = [
     { name = "pytz", specifier = ">=2026.5" },
     { name = "sqlalchemy", specifier = ">=2.1.5" },
     { name = "tzlocal", specifier = ">=5.4.4" },
+    { name = "werkzeug", specifier = "==3.1.9" },
     { name = "wtforms", specifier = ">=3.2.2" },
 ]
 

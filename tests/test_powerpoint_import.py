@@ -49,6 +49,7 @@ class ConversionTests(unittest.TestCase):
         process = MagicMock()
         process.__enter__.return_value = process
         process.returncode = 0
+        process.communicate.return_value = (b'', b'')
         return process
 
     @patch('FlaskTV.office.shutil.which', side_effect=lambda name: f'/usr/bin/{name}')
@@ -84,9 +85,27 @@ class ConversionTests(unittest.TestCase):
     @patch('FlaskTV.office.shutil.which', return_value='/tool')
     def test_success_exit_without_pdf_is_failure(self, _):
         with patch('FlaskTV.office.subprocess.Popen') as popen:
-            popen.return_value.__enter__.return_value.returncode = 0
-            with self.assertRaisesRegex(PowerPointImportError, f'{self.prefix}_failed'):
+            process = popen.return_value.__enter__.return_value
+            process.returncode = 0
+            process.communicate.return_value = (b'', b'Error: source file could not be loaded')
+            with self.assertLogs('FlaskTV.office', level='WARNING') as logs, \
+                    self.assertRaisesRegex(PowerPointImportError, f'{self.prefix}_failed'):
                 self.converter(self.source, self.root)
+            self.assertIn('source file could not be loaded', logs.output[0])
+            self.assertIn('missing_output=True', logs.output[0])
+
+    @patch('FlaskTV.office.shutil.which', return_value='/tool')
+    def test_converter_failure_logs_diagnostics(self, _):
+        with patch('FlaskTV.office.subprocess.Popen') as popen:
+            process = popen.return_value.__enter__.return_value
+            process.returncode = 1
+            process.communicate.return_value = (b'Conversion failed', b'Permission denied\xff')
+            with self.assertLogs('FlaskTV.office', level='WARNING') as logs, \
+                    self.assertRaisesRegex(PowerPointImportError, f'{self.prefix}_failed'):
+                self.converter(self.source, self.root)
+            self.assertIn('exit=1', logs.output[0])
+            self.assertIn('Conversion failed', logs.output[0])
+            self.assertIn('Permission denied', logs.output[0])
 
     @patch('FlaskTV.office.shutil.which', return_value='/tool')
     def test_slide_limit(self, _):

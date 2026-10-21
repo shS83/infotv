@@ -15,5 +15,6 @@ dependencies = [
     "pytz>=2026.5",
     "sqlalchemy>=2.1.5",
     "tzlocal>=5.4.4",
+    "werkzeug==3.1.9",
     "wtforms>=3.2.2",
 ]

@@ -3,7 +3,8 @@ from FlaskTV.forms import RegisterForm, LoginForm, DesignForm, ArrangeForm, Remo
                           UAdminForm, UAdminForm_fi
 
 LANGUAGES = ['en', 'fi']
-PREFIX = 'fi'
+DEFAULT_LANGUAGE = 'fi'
+PREFIX = DEFAULT_LANGUAGE
 FORMS = {
     'en': {
         'registerform': RegisterForm,

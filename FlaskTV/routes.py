@@ -52,10 +52,18 @@ def do_pages_exist():
     return True
 
 
+def get_request_language():
+    language = request.cookies.get('lang')
+    return language if language in langs.LANGUAGES else langs.DEFAULT_LANGUAGE
+
+
+@app.context_processor
+def language_context():
+    return {'current_lang': get_request_language()}
+
+
 def get_lang_prefix():
-    lang_prefix = 'fi'
-    if request.cookies.get('lang') == 'en':
-        lang_prefix = 'en'
+    lang_prefix = get_request_language()
     langs.PREFIX = lang_prefix
     return lang_prefix
 
@@ -92,22 +100,13 @@ def set_theme(theme='blue'):
 
 @app.route('/lang')
 @app.route('/lang/<lang>')
-def set_lang(lang='fi'):
-    safe_redirect = safe_local_redirect(request.referrer)
-    if safe_redirect:
-        if lang in langs.LANGUAGES:
-            res = make_response(redirect(safe_redirect))
-            res.set_cookie('lang', lang)
-            langs.PREFIX = lang
-            return res
-        else:
-            print('ERROR: Language not implemented. Defaulting to Finnish.')
-            res = make_response(redirect(safe_redirect))
-            res.set_cookie('lang', 'fi')
-            langs.PREFIX = 'fi'
-            return res
-    else:
-        return redirect(url_for('home_page'))
+def set_lang(lang=langs.DEFAULT_LANGUAGE):
+    safe_redirect = safe_local_redirect(request.referrer) or url_for('home_page')
+    language = lang if lang in langs.LANGUAGES else langs.DEFAULT_LANGUAGE
+    res = make_response(redirect(safe_redirect))
+    res.set_cookie('lang', language)
+    langs.PREFIX = language
+    return res
 
 
 @app.route('/')

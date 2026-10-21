@@ -1,4 +1,4 @@
-{% set finnish = request.cookies.get('lang') == 'fi' %}
+{% set finnish = current_lang == 'fi' %}
 <form id="ppt-import-form" action="{{ url_for('import_powerpoint_page') }}" method="POST"
       enctype="multipart/form-data" class="mb-4" aria-describedby="ppt-import-help">
     {{ powerpointform.csrf_token(id='ppt-import-csrf') }}

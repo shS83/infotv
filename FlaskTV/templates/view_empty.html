@@ -9,7 +9,7 @@
 <table style="width: 1024px; height: 768px;">
   <tr>
     <td class="align-middle text-center">
-    {% if request.cookies.get("lang") == "fi" %}
+    {% if current_lang == "fi" %}
     <h1>Ole hyvä ja lisää sivuja näyttöön.</h1>
     {% else %}
     <h1>Please add some pages to view.</h1>

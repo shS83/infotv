@@ -1,4 +1,4 @@
-{% set finnish = request.cookies.get('lang') == 'fi' %}
+{% set finnish = current_lang == 'fi' %}
 <form id="doc-import-form" action="{{ url_for('import_word_page') }}" method="POST"
       enctype="multipart/form-data" class="mb-4" aria-describedby="doc-import-help">
     {{ wordform.csrf_token(id='doc-import-csrf') }}

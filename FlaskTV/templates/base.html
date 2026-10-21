@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_lang }}">
 <head>
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
@@ -31,16 +31,7 @@
     {% endif %}
 </head>
 <body>
-    {% if request.cookies.get("lang") %}
-        {% if request.cookies.get("lang") == "en" %}
-            {% include "en/nav.html" %}
-        {% endif %}
-        {% if request.cookies.get("lang") == "fi" %}
-            {% include "fi/nav.html" %}
-        {% endif %}
-    {% else %}
-        {% include "en/nav.html" %}
-    {% endif %}
+    {% include current_lang ~ "/nav.html" %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <br />

@@ -1,4 +1,4 @@
-werkzeug==3.1.6
+werkzeug==3.1.9
 flask
 flask_sqlalchemy
 flask_bcrypt

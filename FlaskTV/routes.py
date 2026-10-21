@@ -126,17 +126,17 @@ def view_page():
     do_pages_exist()
     pages = Page.query.filter_by(enabled=1).all()
     if len(pages) > 0:
-        args = request.args
-        if args:
-            cur_idx = int(args.get('cur_idx'))
-        else:
+        try:
+            cur_idx = int(request.args.get('cur_idx', 0)) % len(pages)
+        except (TypeError, ValueError):
             cur_idx = 0
+        stop = request.args.get('stop', '').lower() == 'true'
 
         nextpage = cur_idx+1
         if nextpage >= len(pages):
             nextpage = 0
         payload = {'current': pages[cur_idx].file, 'next': pages[nextpage].file, 'time': pages[cur_idx].time}
-        return render_template('view.html', page=payload, pages=pages, cur_idx=nextpage)
+        return render_template('view.html', page=payload, pages=pages, cur_idx=nextpage, stop=stop)
     else:
         return render_template('view_empty.html')
 

@@ -1,0 +1,50 @@
+{% set finnish = current_lang == 'fi' %}
+<form id="pdf-import-form" action="{{ url_for('import_pdf_page') }}" method="POST"
+      enctype="multipart/form-data" class="mb-4" aria-describedby="pdf-import-help">
+    {{ pdfform.csrf_token(id='pdf-import-csrf') }}
+    {{ pdfform.pdf_file(id='pdf-import-file', accept='.pdf', required=true, hidden=true) }}
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" id="pdf-import-select" class="btn btn-secondary">Import a PDF file</button>
+        <button type="submit" id="pdf-import-upload" class="btn btn-primary" disabled>Upload</button>
+        <button type="reset" id="pdf-import-cancel" class="btn btn-secondary">Cancel</button>
+        <span id="pdf-import-filename" aria-live="polite"></span>
+        <span id="pdf-import-status" role="status"></span>
+    </div>
+    <p id="pdf-import-help" class="mt-2">
+        {{ 'Jokainen PDF-sivu tuodaan omana kuvana. Enintään 50 Mt ja 100 sivua.' if finnish else 'Each PDF page is imported as an image. Maximum 50 MB and 100 pages.' }}
+    </p>
+</form>
+<script>
+(() => {
+    const form = document.getElementById('pdf-import-form');
+    const fileInput = document.getElementById('pdf-import-file');
+    const selectButton = document.getElementById('pdf-import-select');
+    const uploadButton = document.getElementById('pdf-import-upload');
+    const cancelButton = document.getElementById('pdf-import-cancel');
+    const filename = document.getElementById('pdf-import-filename');
+    const status = document.getElementById('pdf-import-status');
+    let uploading = false;
+
+    selectButton.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        filename.textContent = fileInput.files.length ? fileInput.files[0].name : '';
+        uploadButton.disabled = !fileInput.files.length;
+    });
+    form.addEventListener('reset', () => {
+        fileInput.value = '';
+        filename.textContent = '';
+        status.textContent = '';
+        uploadButton.disabled = true;
+    });
+    form.addEventListener('submit', (event) => {
+        if (uploading) {
+            event.preventDefault();
+            return;
+        }
+        uploading = true;
+        selectButton.disabled = uploadButton.disabled = cancelButton.disabled = true;
+        form.setAttribute('aria-busy', 'true');
+        status.textContent = {{ ('Muunnetaan PDF-tiedostoa…' if finnish else 'Converting PDF…') | tojson }};
+    });
+})();
+</script>

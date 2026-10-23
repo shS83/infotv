@@ -1,10 +1,11 @@
 from FlaskTV import app
 from flask import render_template, redirect, url_for, flash, request, make_response
 from FlaskTV.models import Page, User, Comment
-from FlaskTV.forms import HTMLImportForm, PowerPointImportForm, WordImportForm
+from FlaskTV.forms import HTMLImportForm, PDFImportForm, PowerPointImportForm, WordImportForm
 from FlaskTV.office import MAX_UPLOAD_BYTES, OfficeImportError
 from FlaskTV.powerpoint import convert_slides, slide_html
 from FlaskTV.word import convert_word_pages, word_page_html
+from FlaskTV.pdf import convert_pdf_pages, pdf_page_html
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
@@ -231,7 +232,8 @@ def design_page():
 
     return render_template(f'{langs.PREFIX}/design.html', designform=designform, page_to_edit=page_to_edit,
                            editpage_query=editpage_query, importform=HTMLImportForm(),
-                           powerpointform=PowerPointImportForm(), wordform=WordImportForm())
+                           powerpointform=PowerPointImportForm(), wordform=WordImportForm(),
+                           pdfform=PDFImportForm())
 
 
 @app.route('/design/import', methods=['POST'])
@@ -279,12 +281,20 @@ def import_word_page():
     return _import_office_file('doc')
 
 
+@app.route('/design/import-pdf', methods=['POST'])
+@login_required
+def import_pdf_page():
+    return _import_office_file('pdf')
+
+
 def _import_office_file(kind):
     options = {
         'ppt': dict(form=PowerPointImportForm, field='powerpoint_file', extensions={'ppt', 'pptx'},
                     convert=convert_slides, render=slide_html, label='slide', name='PowerPoint'),
         'doc': dict(form=WordImportForm, field='word_file', extensions={'doc', 'docx'},
                     convert=convert_word_pages, render=word_page_html, label='page', name='Word'),
+        'pdf': dict(form=PDFImportForm, field='pdf_file', extensions={'pdf'},
+                    convert=convert_pdf_pages, render=pdf_page_html, label='page', name='PDF'),
     }[kind]
     lang = get_lang_prefix()
     created_files = []

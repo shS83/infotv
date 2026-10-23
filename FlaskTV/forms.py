@@ -73,6 +73,10 @@ class WordImportForm(FlaskForm):
     word_file = FileField(validators=[FileRequired(), FileAllowed(['doc', 'docx'])])
 
 
+class PDFImportForm(FlaskForm):
+    pdf_file = FileField(validators=[FileRequired(), FileAllowed(['pdf'])])
+
+
 class DesignForm(FlaskForm):
     name = StringField(label='Page description:', validators=[DataRequired()])
     filename = StringField(label='File name to save:', validators=[DataRequired()])

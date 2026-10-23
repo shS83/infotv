@@ -1,5 +1,5 @@
 from FlaskTV import app
-from flask import render_template, redirect, url_for, flash, request, make_response
+from flask import render_template, redirect, url_for, flash, request, make_response, jsonify
 from FlaskTV.models import Page, User, Comment
 from FlaskTV.forms import HTMLImportForm, PDFImportForm, PowerPointImportForm, WordImportForm
 from FlaskTV.office import MAX_UPLOAD_BYTES, OfficeImportError
@@ -140,6 +140,26 @@ def view_page():
         return render_template('view.html', page=payload, pages=pages, cur_idx=nextpage, stop=stop)
     else:
         return render_template('view_empty.html')
+
+
+@app.route('/view/content', methods=['GET'])
+def view_content():
+    do_pages_exist()
+    pages = Page.query.filter_by(enabled=1).all()
+    if not pages:
+        return jsonify(error='no_pages'), 404
+
+    try:
+        cur_idx = int(request.args.get('cur_idx', 0)) % len(pages)
+    except (TypeError, ValueError):
+        cur_idx = 0
+
+    page = pages[cur_idx]
+    next_idx = (cur_idx + 1) % len(pages)
+    rendered_page = render_template('view_content.html', page_file=page.file)
+    response = jsonify(html=rendered_page, time=page.time, next_idx=next_idx)
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
 
 @app.route('/design', methods=['GET', 'POST'])

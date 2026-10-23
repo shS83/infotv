@@ -1,13 +1,56 @@
 {% extends 'view_base.html' %}
 
-{% block head %}
-{% if not stop %}
-<meta http-equiv="Refresh" content="{{ page.time }}; URL={{ url_for('view_page', cur_idx=cur_idx) }}" />
-{% endif %}
-{% endblock %}
 {% block content %}
 <div class="logo"><img src="/static/infotv-logo-2.png"></div>
-{% set current = 'info_pages/' + page.current %}
-{% include current %}
+<div id="view-content" data-next-index="{{ cur_idx }}"
+     data-delay="{{ page.time * 1000 }}"
+     data-content-url="{{ url_for('view_content') }}">
+    {% set current = 'info_pages/' + page.current %}
+    {% include current %}
+</div>
+{% if not stop %}
+<script>
+(function () {
+    var content = document.getElementById('view-content');
 
+    function scheduleNextPage(delay) {
+        window.setTimeout(showNextPage, delay);
+    }
+
+    function showNextPage() {
+        var index = parseInt(content.getAttribute('data-next-index'), 10) || 0;
+        var contentUrl = content.getAttribute('data-content-url');
+        var separator = contentUrl.indexOf('?') === -1 ? '?' : '&';
+        var request = new XMLHttpRequest();
+
+        request.onreadystatechange = function () {
+            if (request.readyState !== 4) return;
+
+            if (request.status >= 200 && request.status < 300) {
+                try {
+                    var page = JSON.parse(request.responseText);
+                    content.innerHTML = page.html;
+                    content.setAttribute('data-next-index', page.next_idx);
+                    scheduleNextPage(Math.max(1, parseInt(page.time, 10) || 10) * 1000);
+                    return;
+                } catch (error) {
+                    // Retry below if the response was not valid JSON.
+                }
+            }
+
+            if (window.console && window.console.error) {
+                window.console.error('Could not load the next InfoTV page.');
+            }
+            scheduleNextPage(5000);
+        };
+
+        request.open('GET', contentUrl + separator + 'cur_idx=' + encodeURIComponent(index), true);
+        request.setRequestHeader('Accept', 'application/json');
+        request.send(null);
+    }
+
+    scheduleNextPage(Math.max(1000, parseInt(content.getAttribute('data-delay'), 10) || 10000));
+}());
+</script>
+{% endif %}
 {% endblock %}

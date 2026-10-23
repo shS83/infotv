@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Arrange page order</h1>
 <br />
-<form method="POST">
+<form method="POST" id="arrange-form">
     {{ arrangeform.hidden_tag() }}
 <div class="container s-accent w-50" style="margin:0px; padding:10px;">
     <div class="row">
@@ -37,22 +37,7 @@
 <br />
 <input type="hidden" id="content" value="" name="arranged_items">
 <button type="button" class="btn btn-primary" id="go" data-bs-toggle="modal" data-bs-target="#Modal-ArrangeConfirm-2">Save order</button>
-<script language="javascript">
- $( function() {
-
-    var sorts = $( "#sortable1, #sortable2" );
-    sorts.sortable({
-      connectWith: ".connectedSortable"
-    }).disableSelection();
-
-  });
-
-var $sortables = $("#sortable1, #sortable2").sortable({
-  stop: function() {
-    document.getElementById("content").value = $sortables.sortable("toArray");
-    }
-});
-</script>
+<script src="{{ url_for('static', filename='arrange.js') }}"></script>
 {% include 'en/includes/arrange_modal.html' %}
 </form>
 {% endblock %}

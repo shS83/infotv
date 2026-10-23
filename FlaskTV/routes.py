@@ -20,36 +20,20 @@ from datetime import datetime, timedelta
 
 
 def do_pages_exist():
-
-    # Query for Page Model, clear the old table if files do not exist and write a replacement
-
-    pages = Page.query.all()
-    path = os.path.join(os.getcwd(), 'FlaskTV', 'templates', 'info_pages')
-    files = os.listdir(path)
-
-    modified = False
-
-    for page in pages:
-        if page.file not in files:
-            pages.remove(page)
-            modified = True
-
-    if modified:
-        try:
-            db.session.query(Page).delete()
+    # Remove only missing files, preserving the IDs and order of surviving pages.
+    page_dir = Path(app.root_path) / 'templates' / 'info_pages'
+    try:
+        missing = [page for page in Page.query.all()
+                   if not (page_dir / page.file).is_file()]
+        if missing:
+            for page in missing:
+                db.session.delete(page)
             db.session.commit()
-        except exc.SQLAlchemyError:
-            db.session.rollback()
-            flash(langs.MESSAGES[langs.PREFIX]['rollback'], category='danger')
-            return False
-
-        for page in pages:
-            page_to_create = Page(name=page.name, file=page.file, time=page.time,
-                                  owner=page.owner, enabled=page.enabled)
-            db.session.add(page_to_create)
-
-        db.session.commit()
-
+    except exc.SQLAlchemyError:
+        db.session.rollback()
+        app.logger.exception('Could not remove missing InfoTV pages')
+        flash(langs.MESSAGES[get_request_language()]['rollback'], category='danger')
+        return False
     return True
 
 
@@ -125,7 +109,7 @@ def red_theme():
 @app.route('/view', methods=['GET'])
 def view_page():
     do_pages_exist()
-    pages = Page.query.filter_by(enabled=1).all()
+    pages = Page.query.filter_by(enabled=1).order_by(Page.id).all()
     if len(pages) > 0:
         try:
             cur_idx = int(request.args.get('cur_idx', 0)) % len(pages)
@@ -145,7 +129,7 @@ def view_page():
 @app.route('/view/content', methods=['GET'])
 def view_content():
     do_pages_exist()
-    pages = Page.query.filter_by(enabled=1).all()
+    pages = Page.query.filter_by(enabled=1).order_by(Page.id).all()
     if not pages:
         return jsonify(error='no_pages'), 404
 
@@ -376,32 +360,20 @@ def _import_office_file(kind):
 @app.route('/arrange', methods=['GET', 'POST'])
 @login_required
 def arrange_page():
-    do_pages_exist()
     get_lang_prefix()
+    if request.method == 'GET':
+        do_pages_exist()
     arrangeform = langs.FORMS[langs.PREFIX]['arrangeform']()
-    pages = Page.query.all()
-    enabled = Page.query.filter_by(enabled=1).all()
-    disabled = Page.query.filter_by(enabled=0).all()
-    right_pane = []
-
-    # If file is in db remove it from the right pane
-
-    path = 'FlaskTV/templates/info_pages'
-    files = os.listdir(path)
-    for page in pages:
-        if page.file in files:
-            files.remove(page.file)
-
-    # Left side Enabled, Right side Disabled (with files from info_pages/)
-
-    # Temp fix
-    for i in range(0, len(disabled)):
-        right_pane.append(disabled[i].file)
-
-    right_pane.extend(files)
+    pages = Page.query.order_by(Page.id).all()
+    enabled = [page for page in pages if page.enabled]
+    page_dir = Path(app.root_path) / 'templates' / 'info_pages'
+    files = {path.name for path in page_dir.glob('*.html') if path.is_file()}
+    known_files = {page.file for page in pages}
+    right_pane = [page.file for page in pages if not page.enabled and page.file in files]
+    right_pane.extend(sorted(files - known_files))
 
     if request.method == 'POST':
-        arrangement = request.form.get('arranged_items').split(',')
+        arrangement = (request.form.get('arranged_items') or '').split(',')
         comment = (request.form.get('comments') or '').strip() or '-'
 
         if arrangement == ['']:
@@ -409,49 +381,33 @@ def arrange_page():
             flash(langs.MESSAGES[langs.PREFIX]['nomod'], category='danger')
             return redirect(url_for('arrange_page'))
 
-        # Disabling and fix disabled list
+        if len(set(arrangement)) != len(arrangement) or not set(arrangement) <= files:
+            flash(langs.MESSAGES[langs.PREFIX]['arrange_invalid'], category='danger')
+            return redirect(url_for('arrange_page'))
 
-        for page in enabled:
-            if page.file not in arrangement:
-                page.enabled = False
-
-        disabled = Page.query.filter_by(enabled=0).all()
-
-        # Drop old table to fix ordering by primary key
-
+        # Snapshot metadata before deleting ORM objects. Rebuild the primary-key
+        # order and save its audit comment in one transaction, so any failure
+        # restores the entire previous arrangement.
+        previous = {page.file: dict(name=page.name, file=page.file, time=page.time,
+                                    owner=page.owner) for page in pages}
+        owner = current_user.id
         try:
             db.session.query(Page).delete()
+            for filename in arrangement:
+                values = previous.get(filename, dict(name=filename, file=filename,
+                                                     time=10, owner=owner))
+                db.session.add(Page(**values, enabled=True))
+            for filename, values in previous.items():
+                if filename in files and filename not in arrangement:
+                    db.session.add(Page(**values, enabled=False))
+            db.session.add(Comment(owner=owner, comment=comment, action='Arrangement change',
+                                   pagefile_related=''))
             db.session.commit()
         except exc.SQLAlchemyError:
             db.session.rollback()
+            app.logger.exception('Could not save InfoTV arrangement (%d pages)', len(arrangement))
             flash(langs.MESSAGES[langs.PREFIX]['rollback'], category='danger')
             return redirect(url_for('arrange_page'))
-
-        # Write new table from pages list in the order of arrangement
-
-        for i in range(0, len(arrangement)):
-            if arrangement[i] in [p.file for p in pages]:
-                for p in pages:
-                    if arrangement[i] == p.file:
-                        page_to_create = Page(name=p.name, file=p.file, time=p.time,
-                                              owner=p.owner, enabled=True)
-                        db.session.add(page_to_create)
-            else:
-                new_page = Page(name=arrangement[i], file=arrangement[i], time=10, owner=current_user.id, enabled=True)
-                db.session.add(new_page)
-
-        # Add back disabled pages to table
-
-        for p in disabled:
-            if p.file not in arrangement:
-                disabled_to_add = Page(name=p.name, file=p.file, time=p.time,
-                                       owner=p.owner, enabled=False)
-                db.session.add(disabled_to_add)
-
-        comment_to_add = Comment(owner=current_user.id, comment=comment, action='Arrangement change',
-                                 pagefile_related='')
-        db.session.add(comment_to_add)
-        db.session.commit()
         flash(f'{len(arrangement)} {langs.MESSAGES[langs.PREFIX]["arranged"]}', category='success')
         return redirect(url_for('arrange_page'))
 

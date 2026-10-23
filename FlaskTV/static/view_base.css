@@ -3,6 +3,53 @@ body {
     overflow: hidden;
 }
 
+/* Share the same viewport-sized layout between playback and preview. */
+.info-page {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.info-page > p {
+    flex: 0 0 auto;
+}
+
+/* Override editor-saved pixel sizes and percentage-width figures. The image
+   uses the space left after any text, without stretching or cropping it. */
+.info-page > .ke-image-container {
+    display: flex;
+    flex: 1 1 0;
+    float: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 0;
+}
+
+.info-page > .ke-image-container > figure {
+    display: flex;
+    width: 100% !important;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 !important;
+}
+
+.info-page > .ke-image-container > figure > img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0;
+    min-height: 0;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
 .logo {
     position: fixed;
     top: 10px;

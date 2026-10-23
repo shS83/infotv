@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="logo"><img src="/static/infotv-logo-2.png"></div>
-<div id="view-content" data-next-index="{{ cur_idx }}"
+<div id="view-content" class="info-page" data-next-index="{{ cur_idx }}"
      data-delay="{{ page.time * 1000 }}"
      data-content-url="{{ url_for('view_content') }}">
     {% set current = 'info_pages/' + page.current %}

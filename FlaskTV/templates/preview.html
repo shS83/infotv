@@ -4,8 +4,9 @@
 {% endblock %}
 {% block content %}
 <div class="logo"><img src="/static/infotv-logo-2.png"></div>
-<br />
+<div class="info-page">
 {% set view = 'info_pages/' + page %}
 {% include view %}
+</div>
 
 {% endblock %}

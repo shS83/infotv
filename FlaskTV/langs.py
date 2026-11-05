@@ -132,6 +132,8 @@ MESSAGES = {
 ACTIONS = {
     'en': {
         'Enable': 'Enable',
+        'Logo on': 'Logo on',
+        'Logo off': 'Logo off',
         'Disable': 'Disable',
         'Timing change': 'Timing change',
         'Arrangement change': 'Arrangement change',
@@ -143,6 +145,8 @@ ACTIONS = {
     },
     'fi': {
         'Enable': 'Otettu käyttöön',
+        'Logo on': 'Logo näkyviin',
+        'Logo off': 'Logo pois',
         'Disable': 'Poistettu käytöstä',
         'Timing change': 'Ajoituksen muutos',
         'Arrangement change': 'Järjestyksen muutos',

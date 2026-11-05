@@ -3,7 +3,9 @@
 {% block head %}
 {% endblock %}
 {% block content %}
+{% if splash_enabled %}
 <div class="logo"><img src="/static/infotv-logo-2.png"></div>
+{% endif %}
 <div class="info-page">
 {% set view = 'info_pages/' + page %}
 {% include view %}

@@ -4,14 +4,14 @@
     {{ pdfform.csrf_token(id='pdf-import-csrf') }}
     {{ pdfform.pdf_file(id='pdf-import-file', accept='.pdf', required=true, hidden=true) }}
     <div class="d-flex flex-wrap align-items-center gap-2">
-        <button type="button" id="pdf-import-select" class="btn btn-secondary">Import a PDF file</button>
-        <button type="submit" id="pdf-import-upload" class="btn btn-primary" disabled>Upload</button>
-        <button type="reset" id="pdf-import-cancel" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="pdf-import-select" class="btn btn-secondary">{% if current_lang == "fi" %}Tuo PDF{% else %}Import a PDF file{% endif %}</button>
+        <button type="submit" id="pdf-import-upload" class="btn btn-primary" disabled>{% if current_lang == "fi" %}Lähetä{% else %}Upload{% endif %}</button>
+        <button type="reset" id="pdf-import-cancel" class="btn btn-secondary">{% if current_lang == "fi" %}Peru{% else %}Cancel{% endif %}</button>
         <span id="pdf-import-filename" aria-live="polite"></span>
         <span id="pdf-import-status" role="status"></span>
     </div>
     <p id="pdf-import-help" class="mt-2">
-        {{ 'Jokainen PDF-sivu tuodaan omana kuvana. Enintään 50 Mt ja 100 sivua.' if finnish else 'Each PDF page is imported as an image. Maximum 50 MB and 100 pages.' }}
+        {% if current_lang == "fi" %}Jokainen PDF-sivu tuodaan omana kuvana. Enintään 50 Mt ja 100 sivua.{% else %}Each PDF page is imported as an image. Maximum 50 MB and 100 pages.'{% endif %}
     </p>
 </form>
 <script>

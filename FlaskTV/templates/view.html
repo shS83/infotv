@@ -1,7 +1,7 @@
 {% extends 'view_base.html' %}
 
 {% block content %}
-<div class="logo"><img src="/static/infotv-logo-2.png"></div>
+<div id="infotv-logo" class="logo"{% if not page.splash_enabled %} hidden{% endif %}><img src="/static/infotv-logo-2.png"></div>
 <div id="view-content" class="info-page" data-next-index="{{ cur_idx }}"
      data-delay="{{ page.time * 1000 }}"
      data-content-url="{{ url_for('view_content') }}">
@@ -30,6 +30,7 @@
                 try {
                     var page = JSON.parse(request.responseText);
                     content.innerHTML = page.html;
+                    document.getElementById('infotv-logo').hidden = !page.splash_enabled;
                     content.setAttribute('data-next-index', page.next_idx);
                     scheduleNextPage(Math.max(1, parseInt(page.time, 10) || 10) * 1000);
                     return;

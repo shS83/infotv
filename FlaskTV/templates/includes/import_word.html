@@ -4,14 +4,14 @@
     {{ wordform.csrf_token(id='doc-import-csrf') }}
     {{ wordform.word_file(id='doc-import-file', accept='.doc,.docx', required=true, hidden=true) }}
     <div class="d-flex flex-wrap align-items-center gap-2">
-        <button type="button" id="doc-import-select" class="btn btn-secondary">Import a DOC/DOCX File</button>
-        <button type="submit" id="doc-import-upload" class="btn btn-primary" disabled>Upload</button>
-        <button type="reset" id="doc-import-cancel" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="doc-import-select" class="btn btn-secondary">{% if current_lang == "fi" %}Tuo DOC/DOCX{% else %}Import a DOC/DOCX File{% endif %}</button>
+        <button type="submit" id="doc-import-upload" class="btn btn-primary" disabled>{% if current_lang == "fi" %}Lähetä{% else %}Upload{% endif %}</button>
+        <button type="reset" id="doc-import-cancel" class="btn btn-secondary">{% if current_lang == "fi" %}Peru{% else %}Cancel{% endif %}</button>
         <span id="doc-import-filename" aria-live="polite"></span>
         <span id="doc-import-status" role="status"></span>
     </div>
     <p id="doc-import-help" class="mt-2">
-        {% if finnish %}
+        {% if current_lang == "fi" %}
         Jokainen asiakirjan sivu tuodaan kuvana. Muokkaa sisältöä Wordissa ennen uutta tuontia.
         Enintään 50 Mt ja 100 sivua. Muunnos voi kestää muutaman minuutin.
         {% else %}

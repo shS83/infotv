@@ -1,0 +1,10 @@
+<td>
+    <button type="submit" name="toggle_logo" value="{{ page.id }}" formnovalidate
+            class="btn {{ 'btn-outline-warning' if page.splash_enabled else 'btn-primary' }}">
+        {% if current_lang == 'en' %}
+            {{ 'Logo off' if page.splash_enabled else 'Logo on' }}
+        {% else %}
+            {{ 'Logo pois' if page.splash_enabled else 'Logo näkyviin' }}
+        {% endif %}
+    </button>
+</td>

@@ -9,6 +9,8 @@ import pytz
 from pytz import timezone
 import tzlocal
 from sqlalchemy import exc
+from flask_migrate import Migrate
+
 
 
 def datetimefilter(value, format="%d/%m/%y %H:%M"):
@@ -27,11 +29,16 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flasktv.db'
 app.config['SECRET_KEY'] = '7697e4d56cd537633a5ab239'
 app.config['UPLOAD_FOLDER'] = './FlaskTV/static'
+# Reload edited HTML templates even when Flask is started without debug mode.
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.request_class = OrderedParamContainer
 app.jinja_env.filters['datetimefilter'] = datetimefilter
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
+
+# Routes import models, which need the initialized extensions above.
 from FlaskTV import routes

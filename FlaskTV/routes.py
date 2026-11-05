@@ -1,5 +1,5 @@
 from FlaskTV import app
-from flask import render_template, redirect, url_for, flash, request, make_response, jsonify
+from flask import render_template, redirect, url_for, flash, request, make_response, jsonify, abort
 from FlaskTV.models import Page, User, Comment
 from FlaskTV.forms import HTMLImportForm, PDFImportForm, PowerPointImportForm, WordImportForm
 from FlaskTV.office import MAX_UPLOAD_BYTES, OfficeImportError
@@ -120,7 +120,8 @@ def view_page():
         nextpage = cur_idx+1
         if nextpage >= len(pages):
             nextpage = 0
-        payload = {'current': pages[cur_idx].file, 'next': pages[nextpage].file, 'time': pages[cur_idx].time}
+        payload = {'current': pages[cur_idx].file, 'next': pages[nextpage].file,
+                   'time': pages[cur_idx].time, 'splash_enabled': pages[cur_idx].splash_enabled}
         return render_template('view.html', page=payload, pages=pages, cur_idx=nextpage, stop=stop)
     else:
         return render_template('view_empty.html')
@@ -141,7 +142,8 @@ def view_content():
     page = pages[cur_idx]
     next_idx = (cur_idx + 1) % len(pages)
     rendered_page = render_template('view_content.html', page_file=page.file)
-    response = jsonify(html=rendered_page, time=page.time, next_idx=next_idx)
+    response = jsonify(html=rendered_page, time=page.time, next_idx=next_idx,
+                       splash_enabled=page.splash_enabled)
     response.headers['Cache-Control'] = 'no-store'
     return response
 
@@ -168,6 +170,7 @@ def design_page():
                         designform.time.data = editpage_query.time
                         designform.name.data = editpage_query.name
                         designform.filename.data = editpage_query.file
+                        designform.splash_enabled.data = editpage_query.splash_enabled
                     else:
                         designform.filename.data = to_edit
                     flash(f'{langs.MESSAGES[langs.PREFIX]["edit"]} {to_edit}', category='info')
@@ -195,12 +198,16 @@ def design_page():
             file_to_save = file_to_save + '.html'
             print(f'new file name: {file_to_save}')
 
-        page_to_add = Page(name=name, file=file_to_save, time=time, owner=current_user.id, enabled=False)
+        page_to_add = Page(name=name, file=file_to_save, time=time, owner=current_user.id,
+                           enabled=False, splash_enabled=designform.splash_enabled.data)
         comment_to_add = Comment(owner=current_user.id, comment=langs.COMMENTS[langs.PREFIX]['newpage'],
                                  action='Page added', pagefile_related=file_to_save)
 
         page_exists = Page.query.filter_by(file=file_to_save).first()
         if page_exists:
+            if page_exists.owner != current_user.id and current_user.username != 'admin':
+                abort(403)
+            page_exists.splash_enabled = designform.splash_enabled.data
             # !?
             if page_exists.name == name and page_exists.time == time:
                 page_to_add = None
@@ -389,7 +396,7 @@ def arrange_page():
         # order and save its audit comment in one transaction, so any failure
         # restores the entire previous arrangement.
         previous = {page.file: dict(name=page.name, file=page.file, time=page.time,
-                                    owner=page.owner) for page in pages}
+                                    owner=page.owner, splash_enabled=page.splash_enabled) for page in pages}
         owner = current_user.id
         try:
             db.session.query(Page).delete()
@@ -509,6 +516,25 @@ def profile_page():
 
     if request.method == 'POST':
         content = request.form
+        if 'toggle_logo' in content:
+            if not removeform.validate_on_submit():
+                abort(400)
+            page = db.session.get(Page, request.form.get('toggle_logo', type=int))
+            if page is None:
+                abort(404)
+            if page.owner != current_user.id and current_user.username != 'admin':
+                abort(403)
+            page.splash_enabled = not page.splash_enabled
+            db.session.add(Comment(owner=current_user.id,
+                                   comment='Info-TV logo',
+                                   action='Logo on' if page.splash_enabled else 'Logo off',
+                                   pagefile_related=page.file))
+            try:
+                db.session.commit()
+            except exc.SQLAlchemyError:
+                db.session.rollback()
+                flash(langs.MESSAGES[langs.PREFIX]['rollback'], category='danger')
+            return redirect(url_for('profile_page'))
         admin_clear = content.get('admin_clear')
         if admin_clear:
             try:
@@ -700,7 +726,9 @@ def preview_page():
 
     page_file = os.path.join(os.getcwd(), 'FlaskTV', 'templates', 'info_pages', page)
     if os.path.isfile(page_file):
-        return render_template(f'preview.html', page=page)
+        saved_page = Page.query.filter_by(file=page).first()
+        return render_template('preview.html', page=page,
+                               splash_enabled=saved_page.splash_enabled if saved_page else True)
     else:
         return redirect(url_for('home_page'))
 

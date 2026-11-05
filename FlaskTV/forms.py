@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, IntegerField, SelectField, BooleanField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, Optional, ValidationError
 from FlaskTV.models import User
 
@@ -78,6 +78,7 @@ class PDFImportForm(FlaskForm):
 
 
 class DesignForm(FlaskForm):
+    splash_enabled = BooleanField(label='Info-TV logo', default=True)
     name = StringField(label='Page description:', validators=[DataRequired()])
     filename = StringField(label='File name to save:', validators=[DataRequired()])
     time = IntegerField(label='Time on display:', validators=[DataRequired()])
@@ -85,6 +86,7 @@ class DesignForm(FlaskForm):
 
 
 class DesignForm_fi(FlaskForm):
+    splash_enabled = BooleanField(label='Info-TV logo', default=True)
     name = StringField(label='Sivun kuvaus:', validators=[DataRequired()])
     filename = StringField(label='Tiedoston nimi:', validators=[DataRequired()])
     time = IntegerField(label='Näyttöaika:', validators=[DataRequired()])

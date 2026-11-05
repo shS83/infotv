@@ -2,9 +2,9 @@
       enctype="multipart/form-data" class="d-flex flex-wrap align-items-center gap-2 mb-4">
     {{ importform.csrf_token(id='html-import-csrf') }}
     {{ importform.html_file(id='html-import-file', accept='.html', required=true, hidden=true) }}
-    <button type="button" id="html-import-select" class="btn btn-secondary">Import a HTML</button>
-    <button type="submit" id="html-import-upload" class="btn btn-primary" disabled>Upload</button>
-    <button type="reset" class="btn btn-secondary">Cancel</button>
+    <button type="button" id="html-import-select" class="btn btn-secondary">{% if current_lang == "fi" %}Tuo HTML{% else %}Import a HTML{% endif %}</button>
+    <button type="submit" id="html-import-upload" class="btn btn-primary" disabled>{% if current_lang == "fi" %}Lähetä{% else %}Upload{% endif %}</button>
+    <button type="reset" id="html-import-cancel" class="btn btn-secondary">{% if current_lang == "fi" %}Peru{% else %}Cancel{% endif %}</button>
     <span id="html-import-filename" aria-live="polite"></span>
 </form>
 <script>

@@ -35,6 +35,7 @@ class Page(db.Model):
     time = db.Column(db.Integer(), nullable=False)
     owner = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     enabled = db.Column(db.Boolean(), nullable=False)
+    splash_enabled = db.Column(db.Boolean(), nullable=False, default=True, server_default=db.true())
 
     def __repr__(self):
         return f'Page name {self.name}\nFile {self.file}\nTime {self.time}\nOwner {self.owner}'

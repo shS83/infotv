@@ -32,6 +32,7 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    text-align: center; /* Fallback for Opera versions without flexbox. */
 }
 
 .info-page > .ke-image-container > figure {
@@ -44,6 +45,7 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    text-align: center;
 }
 
 .info-page > .ke-image-container > figure > img {

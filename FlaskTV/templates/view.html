@@ -30,6 +30,7 @@
                 try {
                     var page = JSON.parse(request.responseText);
                     content.innerHTML = page.html;
+                    if (window.InfoTVFitImages) window.InfoTVFitImages();
                     document.getElementById('infotv-logo').hidden = !page.splash_enabled;
                     content.setAttribute('data-next-index', page.next_idx);
                     scheduleNextPage(Math.max(1, parseInt(page.time, 10) || 10) * 1000);
